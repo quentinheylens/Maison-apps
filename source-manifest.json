@@ -1,16 +1,16 @@
 {
   "files": {
     ".github/workflows/publish.yml": {
-      "bytes": 5727,
-      "sha256": "6f9f409c671d29d23ec7b4906e57c7babf6694145379b4b2eec005580c7d6511"
+      "bytes": 5960,
+      "sha256": "b279bc4c6ad04fd163a1148852d9f91f5d0668dd7af9f321cdab3d7e0296881e"
     },
     ".github/workflows/verify.yml": {
-      "bytes": 13171,
-      "sha256": "57eabe7f826ec57d800f2dd1f7766b8af0d726ba620e61c63d722e9e4707fc0f"
+      "bytes": 11418,
+      "sha256": "b8a1f7275c0065855ff0258393118955f7809781b3cc7ee4a27c7cc59bdde4b7"
     },
     "DEPENDENCIES.json": {
-      "bytes": 2476,
-      "sha256": "a36caf07e98e7af7dfa23a7aa1684537291599d0bbe07bbe45a57a1b7add21a9"
+      "bytes": 3492,
+      "sha256": "4802043389d3973b67e24660da652be51c726be2a9586ae1745d8fbfbe6ee94c"
     },
     "NOTICE.md": {
       "bytes": 1508,
@@ -21,8 +21,8 @@
       "sha256": "d02f73b1548a8892de0c56a61c68a7a346c054cb71f1a67bb81d5ff6a07532ff"
     },
     "SECURITY.md": {
-      "bytes": 5488,
-      "sha256": "89a8b23f85aa6f2fda28791d90a1fb61e05d524414c5be57c5a3ae91dd5b0237"
+      "bytes": 6833,
+      "sha256": "c4a8ad80d08d240672386f3418b76be93eb506babb0dfeb87e7a91404fdc1390"
     },
     "catalog-policy.json": {
       "bytes": 231,
@@ -33,8 +33,8 @@
       "sha256": "492d06b94d56b3831253f3699ccbfe766e1fec038bf6db54c618caf8fbaff06e"
     },
     "sources/maison_deployment_simulator/Dockerfile": {
-      "bytes": 601,
-      "sha256": "feaae319ca5bdb6acceb71c69a933cdc335f176c1501539e016d18e7f29f8889"
+      "bytes": 2926,
+      "sha256": "581e1e6355c4aa670a9f06bf7f04e0710e445e5529bc2a811f4daefc639a29e7"
     },
     "sources/maison_deployment_simulator/PyYAML-LICENSE": {
       "bytes": 1101,
@@ -205,8 +205,8 @@
       "sha256": "953408cd2570f0c83dc2fe39f7e4e388e41eeb05738aa69196a5f6ffcf6ba79e"
     },
     "sources/maison_diagnostic_gateway_v6/Dockerfile": {
-      "bytes": 601,
-      "sha256": "55b83dbe38d34d5d31dae296c2e542721af799fd5d29dbfe6c527edf2fb3e9bf"
+      "bytes": 2926,
+      "sha256": "79b32b17d5d27644b5c458cbdba28a39a5d2850e9e6ce52a18c65d7df4528d51"
     },
     "sources/maison_diagnostic_gateway_v6/PyYAML-LICENSE": {
       "bytes": 1101,
@@ -377,12 +377,12 @@
       "sha256": "953408cd2570f0c83dc2fe39f7e4e388e41eeb05738aa69196a5f6ffcf6ba79e"
     },
     "tools/catalog.py": {
-      "bytes": 28717,
-      "sha256": "a4d6dd4a0401b2c97e84c3b68374473e3ce4c50fce90189a74e2c2dff6285f30"
+      "bytes": 31361,
+      "sha256": "279cb304d252963b194cddd9978c18384be343c7617d44c72ce624ab943f8fd0"
     },
     "tools/check_maintenance_image.py": {
-      "bytes": 9824,
-      "sha256": "013ea45240a66bf8dc453662c590b31b249e3b696b044fafd7ed6b2f8df358fa"
+      "bytes": 10614,
+      "sha256": "831fd3f27573b66199260b6132f867fe947cb91661ca67bf302869a25dc68014"
     }
   },
   "format": 1

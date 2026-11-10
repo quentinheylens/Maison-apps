@@ -58,14 +58,25 @@ vulnerabilities. There were 111 literal advisory identifiers (105 CVE,
 6 GHSA); aliases are not assumed independent or falsely classified as fixed.
 OpenSSL findings repeat for libcrypto/libssl and BusyBox for its split packages.
 59 of 73 High/Critical package matches had a recorded fix; 14 High matches
-(SQLite and Python) did not in that database. No exploit was demonstrated and
+(SQLite and OpenSSL) did not in that database. No exploit was demonstrated and
 no advisory has been waived as a false positive.
 
-The base is updated to official **Python 3.12.16 / Alpine 3.24**, pinned by
+The base is updated to official **Python 3.14.10 / Alpine 3.24**, pinned by
 multiarchitecture index digest in `DEPENDENCIES.json`, with upstream build
-commit and both architecture manifests. This retains the Python 3.12 API
-rather than introducing an unnecessary minor-version migration. No moving
+commit and both architecture manifests. Python 3.12.16 was tested first but still matched advisories whose safe stable
+fixes are on newer Python branches; the maintained stable 3.14 branch is now
+tested on both architectures. No moving
 `apk upgrade`, third-party base or unpinned dependency installer is added.
+Signed official zlib 1.4-r0 APKs are checksum-pinned separately for both
+architectures and verified against the pinned base architecture-specific keys.
+Only these fixed local APKs are installed, with networking disabled during RUN.
+The unused SQLite library and its Python modules are removed through the package
+manager and filesystem; pip, its scripts and ensurepip wheels are also removed.
+Their imports must fail in runtime tests; no scanner metadata is hidden or
+rewritten. Simulations use JSON files and do not need SQLite or package installers.
+Python SSL and compression remain tested. The original base layers still contain
+superseded bytes, as with ordinary layered image updates; only the merged runtime
+is executed and audited. Do not treat deletion as confidential data erasure.
 The base's PSF/system-package licences still apply; vendored PyYAML 6.0.3
 and its MIT licence are unchanged and hash checked.
 
@@ -86,3 +97,10 @@ required `offline-build` gate, including unfixed findings. There are **no
 exemptions** and no `ignore-unfixed` flag. Fresh Grype and native results must
 be reviewed for the exact final PR revision before publication. No image,
 store metadata or Home Assistant installation is published by these tests.
+
+The publisher additionally refuses environments that allow administrator bypass.
+The GitHub environment/branch settings API is unavailable in this Codex task
+(`Forbidden`); repository-side checks fail closed, but the actual settings must
+be independently reviewed before any publication. QEMU is checksum-pinned and
+used only for cross-building on disposable AMD64 CI runners. ARM64 runtime tests
+remain on a native `ubuntu-24.04-arm` runner, without emulation.

@@ -15,7 +15,8 @@ import zipfile
 APPS = {"maison_diagnostic_gateway_v6": ("diagnostic", "0.6.1"),
         "maison_deployment_simulator": ("deployment", "0.1.1")}
 ARCHES = {"aarch64": "arm64", "amd64": "amd64"}
-BASE = "python:3.12.16-alpine3.24@sha256:e064671ca452259bab50e8e2c7bd896e39e9a343bb06ca25234adf6fe18d0fc7"
+BASE = 'python:3.14.10-alpine3.24@sha256:a18b20ad69e74df6cf6d2e1b1a260d7a1ecf5380fd83b310f83ba88c461cf894'
+RUNTIME_HARDENING = 'ADD --checksum=sha256:7b05bc778b8b25cd880835b40114182bd4d1581717504d0129c810c0a14291cb https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/zlib-1.4-r0.apk /tmp/zlib-amd64.apk\nADD --checksum=sha256:d3e30d012a3445222b0b4a28f1d4d97ce67387f8b48561921111696da174f0de https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/zlib-1.4-r0.apk /tmp/zlib-arm64.apk\nRUN --network=none python3 - <<\'HARDEN\'\nimport hashlib,platform,subprocess,zlib\nfrom pathlib import Path\narch={\'x86_64\':\'amd64\',\'aarch64\':\'arm64\'}[platform.machine()]\nfile=Path(\'/tmp/zlib-\'+arch+\'.apk\')\nchecksums={\'amd64\': \'7b05bc778b8b25cd880835b40114182bd4d1581717504d0129c810c0a14291cb\', \'arm64\': \'d3e30d012a3445222b0b4a28f1d4d97ce67387f8b48561921111696da174f0de\'}\nassert hashlib.sha256(file.read_bytes()).hexdigest()==checksums[arch]\nsubprocess.run([\'apk\',\'--no-network\',\'verify\',str(file)],check=True)\nsubprocess.run([\'apk\',\'--no-network\',\'add\',str(file)],check=True)\nfrom pathlib import Path\nimport subprocess,sysconfig,shutil,importlib.util\nblocks=Path(\'/lib/apk/db/installed\').read_text().split(\'\\n\\n\')\nrecord=next(block for block in blocks if \'\\nP:.python-rundeps\\n\' in \'\\n\'+block+\'\\n\')\ndeps=next(line[2:].split() for line in record.splitlines() if line.startswith(\'D:\'))\nassert deps.count(\'so:libsqlite3.so.0\')==1\nsubprocess.run([\'apk\',\'--no-network\',\'add\',*[x for x in deps if x!=\'so:libsqlite3.so.0\']],check=True)\nsubprocess.run([\'apk\',\'--no-network\',\'del\',\'.python-rundeps\'],check=True)\nstdlib=Path(sysconfig.get_path(\'stdlib\')); site=Path(sysconfig.get_path(\'purelib\'))\nfor name in (\'sqlite3\',\'ensurepip\'):shutil.rmtree(stdlib/name)\nfor file in (stdlib/\'lib-dynload\').glob(\'_sqlite3.*.so\'):file.unlink()\nfor file in [site/\'pip\',*site.glob(\'pip-*.dist-info\')]:shutil.rmtree(file)\nfor name in (\'pip\',\'pip3\',\'pip3.14\'):(Path(\'/usr/local/bin\')/name).unlink(missing_ok=True)\nassert all(importlib.util.find_spec(name) is None for name in (\'sqlite3\',\'_sqlite3\',\'pip\',\'ensurepip\'))\nassert not list(Path(\'/usr/lib\').glob(\'libsqlite3.so*\'))\n\n# Load zlib in a fresh interpreter after replacing its shared library.\nsubprocess.run([\'python3\',\'-c\',"import zlib; assert zlib.ZLIB_RUNTIME_VERSION==\'1.4\'; assert zlib.decompress(zlib.compress(b\'offline-simulation\'))==b\'offline-simulation\'"],check=True)\nfor file in Path(\'/tmp\').glob(\'zlib-*.apk\'):file.unlink()\nHARDEN\n'
 FLAGS = "homeassistant_api hassio_api auth_api docker_api host_network host_pid host_dbus full_access ingress".split()
 GATEWAY = "__init__ audit bounded_audit data_source policy real_source redaction service simulation_entrypoint".split()
 MAINTENANCE = "__init__ code_index diagnostics entrypoint evidence fixtures network_lock plan private_audit runtime safe_fs transactions".split()
@@ -61,7 +62,7 @@ def ordinary(path):
 
 
 def recipe(role):
-    return (f"FROM {BASE}\nWORKDIR /app\nCOPY gateway /app/gateway\nCOPY maintenance /app/maintenance\n"
+    return (f"FROM {BASE}\n{RUNTIME_HARDENING}WORKDIR /app\nCOPY gateway /app/gateway\nCOPY maintenance /app/maintenance\n"
             "COPY yaml /app/yaml\nCOPY PyYAML-LICENSE /app/PyYAML-LICENSE\n"
             "COPY installation-profile.json /app/installation-profile.json\nCOPY healthcheck.py /app/healthcheck.py\n"
             f"ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 MAISON_ROLE={role}\n"
@@ -207,7 +208,7 @@ def check_image_archive(path, root, slug, arch, commit, image_id):
             raise ValueError("unreviewed healthcheck or application entrypoint")
         env = config["config"].get("Env", [])
         env_keys = {value.split("=", 1)[0] for value in env}
-        if (labels != expected_labels or env_keys != {"PATH", "LANG", "GPG_KEY", "PYTHON_VERSION", "PYTHON_SHA256",
+        if (labels != expected_labels or env_keys != {"PATH", "LANG", "PYTHON_VERSION", "PYTHON_SHA256",
                 "PYTHONDONTWRITEBYTECODE", "PYTHONUNBUFFERED", "MAISON_ROLE"} or len(env) != len(env_keys)
                 or CREDENTIALS.search(json.dumps(config))):
             raise ValueError("unreviewed image environment or metadata")
@@ -322,6 +323,8 @@ def absent(tag, policy=None):
 
 def protected_environment(policy):
     data = json.loads(run("gh", "api", "repos/" + policy["repository"] + "/environments/catalog-publication"))
+    if data.get("can_admins_bypass") is not False:
+        raise ValueError("publication environment must disable administrator bypass")
     if not any(rule.get("type") == "required_reviewers" and rule.get("reviewers")
                for rule in data.get("protection_rules", [])):
         raise ValueError("protected publication environment with a required reviewer must already exist")

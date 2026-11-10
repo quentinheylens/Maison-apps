@@ -120,6 +120,16 @@ print(json.dumps({'runtime_capabilities_zero':True,'no_new_privileges':True,'sec
 """
             isolation = json.loads(subprocess.check_output(docker + ["exec", "--user", "65532:65532", container,
                                                                      "python3", "-c", probe], text=True))
+            dependency_probe = """import importlib.util,json,platform,ssl,zlib
+assert platform.python_version()=='3.14.10'
+assert all(importlib.util.find_spec(name) is None for name in ('sqlite3','_sqlite3','pip','ensurepip'))
+assert zlib.ZLIB_RUNTIME_VERSION=='1.4'
+assert zlib.decompress(zlib.compress(b'offline-simulation'))==b'offline-simulation'
+print(json.dumps({'python':platform.python_version(),'openssl':ssl.OPENSSL_VERSION,'zlib':zlib.ZLIB_RUNTIME_VERSION,
+ 'sqlite_absent':True,'pip_and_ensurepip_absent':True,'compression_roundtrip_passed':True}))
+"""
+            minimized_runtime = json.loads(subprocess.check_output(docker + ["exec", "--user", "65532:65532", container,
+                "python3", "-c", dependency_probe], text=True))
             metadata = json.loads(subprocess.check_output(docker + ["inspect", container], text=True))[0]
             host = metadata["HostConfig"]
             assert host["Privileged"] is False and host["ReadonlyRootfs"] is True
@@ -135,7 +145,7 @@ print(json.dumps({'runtime_capabilities_zero':True,'no_new_privileges':True,'sec
             assert state["ExitCode"] == 0
         finally:
             subprocess.run(docker + ["rm", "--force", container], capture_output=True)
-        return {"selftest": reports[0], "runtime_isolation": isolation, "healthcheck_isolation": health_isolation,
+        return {"minimized_runtime": minimized_runtime, "selftest": reports[0], "runtime_isolation": isolation, "healthcheck_isolation": health_isolation,
                 "unsafe_direct_healthchecks_refused": 2, "forged_heartbeats_refused": 6, "forged_activations_refused": 3,
                 "normal_simulation_health_passed": True, "clean_stop_exit_code": 0}
 

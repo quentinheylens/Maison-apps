@@ -1,4 +1,35 @@
-FROM python:3.12.16-alpine3.24@sha256:e064671ca452259bab50e8e2c7bd896e39e9a343bb06ca25234adf6fe18d0fc7
+FROM python:3.14.10-alpine3.24@sha256:a18b20ad69e74df6cf6d2e1b1a260d7a1ecf5380fd83b310f83ba88c461cf894
+ADD --checksum=sha256:7b05bc778b8b25cd880835b40114182bd4d1581717504d0129c810c0a14291cb https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/zlib-1.4-r0.apk /tmp/zlib-amd64.apk
+ADD --checksum=sha256:d3e30d012a3445222b0b4a28f1d4d97ce67387f8b48561921111696da174f0de https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/zlib-1.4-r0.apk /tmp/zlib-arm64.apk
+RUN --network=none python3 - <<'HARDEN'
+import hashlib,platform,subprocess,zlib
+from pathlib import Path
+arch={'x86_64':'amd64','aarch64':'arm64'}[platform.machine()]
+file=Path('/tmp/zlib-'+arch+'.apk')
+checksums={'amd64': '7b05bc778b8b25cd880835b40114182bd4d1581717504d0129c810c0a14291cb', 'arm64': 'd3e30d012a3445222b0b4a28f1d4d97ce67387f8b48561921111696da174f0de'}
+assert hashlib.sha256(file.read_bytes()).hexdigest()==checksums[arch]
+subprocess.run(['apk','--no-network','verify',str(file)],check=True)
+subprocess.run(['apk','--no-network','add',str(file)],check=True)
+from pathlib import Path
+import subprocess,sysconfig,shutil,importlib.util
+blocks=Path('/lib/apk/db/installed').read_text().split('\n\n')
+record=next(block for block in blocks if '\nP:.python-rundeps\n' in '\n'+block+'\n')
+deps=next(line[2:].split() for line in record.splitlines() if line.startswith('D:'))
+assert deps.count('so:libsqlite3.so.0')==1
+subprocess.run(['apk','--no-network','add',*[x for x in deps if x!='so:libsqlite3.so.0']],check=True)
+subprocess.run(['apk','--no-network','del','.python-rundeps'],check=True)
+stdlib=Path(sysconfig.get_path('stdlib')); site=Path(sysconfig.get_path('purelib'))
+for name in ('sqlite3','ensurepip'):shutil.rmtree(stdlib/name)
+for file in (stdlib/'lib-dynload').glob('_sqlite3.*.so'):file.unlink()
+for file in [site/'pip',*site.glob('pip-*.dist-info')]:shutil.rmtree(file)
+for name in ('pip','pip3','pip3.14'):(Path('/usr/local/bin')/name).unlink(missing_ok=True)
+assert all(importlib.util.find_spec(name) is None for name in ('sqlite3','_sqlite3','pip','ensurepip'))
+assert not list(Path('/usr/lib').glob('libsqlite3.so*'))
+
+# Load zlib in a fresh interpreter after replacing its shared library.
+subprocess.run(['python3','-c',"import zlib; assert zlib.ZLIB_RUNTIME_VERSION=='1.4'; assert zlib.decompress(zlib.compress(b'offline-simulation'))==b'offline-simulation'"],check=True)
+for file in Path('/tmp').glob('zlib-*.apk'):file.unlink()
+HARDEN
 WORKDIR /app
 COPY gateway /app/gateway
 COPY maintenance /app/maintenance
