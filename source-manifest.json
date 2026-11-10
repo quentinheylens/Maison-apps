@@ -46,11 +46,11 @@
     },
     "real-diagnostic/source-manifest.json": {
       "bytes": 5979,
-      "sha256": "89abd25bf90bad32a589404c8e7b17a34208fad8ad3f3c9c51367a0bce00f5ab"
+      "sha256": "a285e5e3346f0301a4f17febe984b0f59d61dce93b35994d8f9774cdc42027bb"
     },
     "real-diagnostic/tests/test_distribution.py": {
-      "bytes": 5492,
-      "sha256": "a386b43c49487f8303303f8207377252e58bda4febc310f1c7e7efc9b58cb1cd"
+      "bytes": 6135,
+      "sha256": "48a34be9b33e4acbb5d11853e48765a1b2bcaa38a66e0ec6df3162c95c030727"
     },
     "real-diagnostic/tests/test_read_boundary.py": {
       "bytes": 17776,
@@ -513,8 +513,8 @@
       "sha256": "00346e795da1da5bec398c88ea3597556f4aac613c6e3947aa369c3c276554c8"
     },
     "tools/catalog.py": {
-      "bytes": 31831,
-      "sha256": "60ab034b3fbba5428bbe90fe35b2da43625aa3e3479c28713f16d0cc0989f3f0"
+      "bytes": 31852,
+      "sha256": "9c056b0f770a89ef955b866eee16989128ba1effd673fd7bf6a86e654dbdfbff"
     },
     "tools/check_maintenance_image.py": {
       "bytes": 11757,

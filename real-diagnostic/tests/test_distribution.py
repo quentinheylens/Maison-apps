@@ -3,6 +3,7 @@ import copy
 import importlib.util
 import json
 import subprocess
+import shutil
 from pathlib import Path
 import sys
 import tempfile
@@ -73,6 +74,14 @@ class DistributionTests(unittest.TestCase):
         result=subprocess.run([sys.executable,'-I',str(ROOT/'tools/catalog.py'),'validate','--root',str(ROOT)],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         self.assertFalse((ROOT/'tools/__pycache__').exists())
+    def test_validation_never_executes_extension_code_supplied_by_target_root(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target=Path(folder)/'catalogue'
+            shutil.copytree(ROOT,target,ignore=shutil.ignore_patterns('.git','__pycache__'))
+            marker=Path(folder)/'executed'
+            (target/'tools/real_catalog.py').write_text('from pathlib import Path\nPath('+repr(str(marker))+').write_text("executed")\nraise RuntimeError("untrusted extension executed")\n')
+            with self.assertRaises(ValueError):real.base.validate(target)
+            self.assertFalse(marker.exists())
     def test_archive_hash_mismatch_is_refused_before_docker_load(self):
         with tempfile.TemporaryDirectory() as folder:
             path=Path(folder)/'real-amd64.tar';path.write_bytes(b'untrusted')

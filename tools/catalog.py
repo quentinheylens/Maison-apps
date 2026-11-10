@@ -111,7 +111,7 @@ def validate(root):
         import importlib.util
         import sys
         sys.dont_write_bytecode = True
-        spec = importlib.util.spec_from_file_location("real_extension", root / "tools/real_catalog.py")
+        spec = importlib.util.spec_from_file_location("real_extension", Path(__file__).resolve().parent / "real_catalog.py")
         real = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(real)
         extra, extra_promoted = real.extension(root)
