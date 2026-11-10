@@ -1,0 +1,17 @@
+{
+  "commit": "632d72a76b397c5ee10be0b2ba21da72c70fced8",
+  "format": 1,
+  "images": {
+    "maison_diagnostic_real_v8": {
+      "digest": "sha256:79a6e7890da8662ac84c8b82e70da9de1e4218b7f5914b4012ad5d69d1aca1c7",
+      "image": "ghcr.io/quentinheylens/maison-apps/maison_diagnostic_real_v8",
+      "version": "0.8.0"
+    }
+  },
+  "read_only": true,
+  "repository": "quentinheylens/Maison-apps",
+  "run_attempt": 2,
+  "run_id": 42867399153,
+  "simulation": false,
+  "workflow": ".github/workflows/publish-real.yml"
+}
