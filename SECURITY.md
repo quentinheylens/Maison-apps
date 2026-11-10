@@ -61,11 +61,11 @@ OpenSSL findings repeat for libcrypto/libssl and BusyBox for its split packages.
 (SQLite and OpenSSL) did not in that database. No exploit was demonstrated and
 no advisory has been waived as a false positive.
 
-The base is updated to official **Python 3.14.10 / Alpine 3.24**, pinned by
+The base is updated to official **Python 3.15.2 / Alpine 3.24**, pinned by
 multiarchitecture index digest in `DEPENDENCIES.json`, with upstream build
 commit and both architecture manifests. Python 3.12.16 was tested first but still matched advisories whose safe stable
-fixes are on newer Python branches; the maintained stable 3.14 branch is now
-tested on both architectures. No moving
+fixes are on newer Python branches; 3.14.10 eliminated all High/Critical findings but retained
+CVE-2025-15367, fixed in the maintained stable 3.15.2 release now tested on both architectures. No moving
 `apk upgrade`, third-party base or unpinned dependency installer is added.
 Signed official zlib 1.4-r0 APKs are checksum-pinned separately for both
 architectures and verified against the pinned base architecture-specific keys.

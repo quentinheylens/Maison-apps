@@ -121,7 +121,7 @@ print(json.dumps({'runtime_capabilities_zero':True,'no_new_privileges':True,'sec
             isolation = json.loads(subprocess.check_output(docker + ["exec", "--user", "65532:65532", container,
                                                                      "python3", "-c", probe], text=True))
             dependency_probe = """import importlib.util,json,platform,ssl,zlib
-assert platform.python_version()=='3.14.10'
+assert platform.python_version()=='3.15.2'
 assert all(importlib.util.find_spec(name) is None for name in ('sqlite3','_sqlite3','pip','ensurepip'))
 assert zlib.ZLIB_RUNTIME_VERSION=='1.4'
 assert zlib.decompress(zlib.compress(b'offline-simulation'))==b'offline-simulation'
