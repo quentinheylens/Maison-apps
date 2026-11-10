@@ -7,10 +7,145 @@ on:
 permissions:
   contents: read
 jobs:
+  native-arm64:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Exercise both simulators on a native ARM64 host, without network
+        run: |
+          python3 -I -B - <<'PY'
+          import importlib.util,json,os,pathlib,platform,subprocess,sys
+          assert platform.machine().lower() in {'aarch64','arm64'}, 'native ARM64 host required'
+          spec=importlib.util.spec_from_file_location('catalog','tools/catalog.py')
+          c=importlib.util.module_from_spec(spec); spec.loader.exec_module(c)
+          policy=c.validate('.'); commit=os.environ['GITHUB_SHA']; c.exact_commit('.',commit)
+          output=pathlib.Path('/tmp/native-arm64-reports'); output.mkdir(mode=0o700)
+          def annotation(title,data):
+            value=json.dumps(data,sort_keys=True).replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+            print('::notice title='+title+'::'+value,flush=True)
+          annotation('Native ARM64 host',{'architecture':platform.machine(),'commit':commit,'runner':os.environ.get('RUNNER_ARCH')})
+          for slug,(role,version) in c.APPS.items():
+            tag=c.image_name(policy,slug)+':native-arm64-validation'
+            labels={'io.hass.version':version,'io.hass.type':'app','io.hass.arch':'aarch64',
+                    'org.opencontainers.image.source':'https://github.com/'+policy['repository'],
+                    'org.opencontainers.image.revision':commit,'org.opencontainers.image.version':version}
+            command=['docker','build','--platform','linux/arm64','--tag',tag]
+            for name,value in labels.items(): command += ['--label',name+'='+value]
+            subprocess.run(command+['sources/'+slug],check=True)
+            result=json.loads(subprocess.check_output([sys.executable,'-I','tools/check_maintenance_image.py',tag],text=True))
+            assert result['selftest']['role']==role and result['selftest']['version']==version
+            archive=output/(slug+'.tar')
+            subprocess.run(['docker','save','--output',str(archive),tag],check=True)
+            image_id=c.run('docker','image','inspect','--format','{{.Id}}',tag)
+            c.check_image_archive(archive,pathlib.Path('.'),slug,'aarch64',commit,image_id)
+            archive.unlink()
+            result.update({'host_architecture':platform.machine(),'source_commit':commit,'image_id':image_id})
+            (output/(slug+'.json')).write_text(json.dumps(result,indent=2)+'\n')
+            annotation('Native ARM64 '+role,result)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: native-arm64-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/native-arm64-reports/*.json
+          retention-days: 14
+          if-no-files-found: error
+
+  vulnerability-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GRYPE_DB_CACHE_DIR: /tmp/maison-grype-db
+      GRYPE_CHECK_FOR_APP_UPDATE: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Prepare the four reviewed images locally, without publication
+        run: python3 -I tools/catalog.py build --root . --commit "$GITHUB_SHA" --output /tmp/audit-images
+      - name: Install checksum-pinned Grype in an ephemeral directory
+        run: |
+          python3 -I - <<'PY'
+          import hashlib,io,pathlib,tarfile,urllib.request
+          url='https://github.com/anchore/grype/releases/download/v0.121.3/grype_0.121.3_linux_amd64.tar.gz'
+          data=urllib.request.urlopen(url,timeout=60).read(100*1024*1024)
+          assert hashlib.sha256(data).hexdigest()=='e9da18cc1429e786722e32161288103600efffd8e483c90761f90485bd1bec85'
+          with tarfile.open(fileobj=io.BytesIO(data),mode='r:gz') as archive:
+            member=archive.getmember('grype'); assert member.isfile() and member.size<150*1024*1024
+            binary=archive.extractfile(member).read()
+          tool=pathlib.Path('/tmp/maison-grype'); tool.write_bytes(binary); tool.chmod(0o700)
+          PY
+          /tmp/maison-grype version
+      - name: Update the official vulnerability database and scan all images and vendored PyYAML
+        run: |
+          python3 -I - <<'PY'
+          import datetime,hashlib,json,os,pathlib,subprocess
+          output=pathlib.Path('/tmp/vulnerability-reports'); output.mkdir(mode=0o700)
+          tool='/tmp/maison-grype'
+          subprocess.run([tool,'db','update'],check=True)
+          status=subprocess.check_output([tool,'db','status','--output','json'],text=True)
+          (output/'database.json').write_text(status)
+          def annotation(title,data,level='notice'):
+            value=json.dumps(data,sort_keys=True,separators=(',',':'))
+            if len(value)>50000: value=json.dumps({'truncated':True,'see_artifact':True,'items':len(data) if isinstance(data,list) else None})
+            value=value.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+            print('::'+level+' title='+title+'::'+value,flush=True)
+          annotation('Vulnerability database',json.loads(status))
+          dependency=json.load(open('DEPENDENCIES.json'))['vendored']
+          sbom={'bomFormat':'CycloneDX','specVersion':'1.5','version':1,'components':[
+            {'type':'library','name':dependency['name'],'version':dependency['version'],'purl':'pkg:pypi/pyyaml@'+dependency['version']}]}
+          (output/'vendored-pyyaml.cdx.json').write_text(json.dumps(sbom))
+          images=json.load(open('/tmp/audit-images/tested.json'))
+          targets=[(x['slug']+'-'+x['arch'],'docker-archive:/tmp/audit-images/'+x['archive']) for x in images['images']]
+          targets.append(('vendored-pyyaml','sbom:'+str(output/'vendored-pyyaml.cdx.json')))
+          counts={}; high=0; reports=[]
+          for name,target in targets:
+            file=output/(name+'.json')
+            subprocess.run([tool,target,'--output','json','--file',str(file)],check=True)
+            report=json.loads(file.read_text()); findings=[]
+            for match in report.get('matches',[]):
+              v=match['vulnerability']; a=match['artifact']; severity=v.get('severity','Unknown')
+              counts[severity]=counts.get(severity,0)+1
+              high += int(severity in {'High','Critical'})
+              findings.append({'id':v['id'],'severity':severity,'package':a['name'],'version':a['version'],
+                'fix':v.get('fix',{}).get('versions',[]),'type':a.get('type'),'advisory':v.get('dataSource')})
+            reports.append({'target':name,'matches':len(findings),'sha256':hashlib.sha256(file.read_bytes()).hexdigest()})
+            annotation('CVE '+name,findings,'warning' if findings else 'notice')
+          summary={'source_commit':os.environ['GITHUB_SHA'],'scanner':'Grype 0.121.3','counts':counts,
+                   'high_or_critical_matches':high,'reports':reports,'ignore_unfixed':False,'exemptions':[]}
+          (output/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+          annotation('Vulnerability audit summary',summary,'warning' if high else 'notice')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as stream: stream.write('```json\n'+json.dumps(summary,indent=2)+'\n```\n')
+          if high: raise SystemExit('High/Critical findings require remediation and explicit review; no automatic exemptions')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: vulnerability-audit-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/vulnerability-reports/
+          retention-days: 14
+          if-no-files-found: error
+
   offline-build:
+    needs: [native-arm64, vulnerability-audit]
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Require successful native runtime tests and vulnerability audit
+        env:
+          NATIVE_RESULT: ${{ needs.native-arm64.result }}
+          AUDIT_RESULT: ${{ needs.vulnerability-audit.result }}
+        run: test "$NATIVE_RESULT" = success && test "$AUDIT_RESULT" = success
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
