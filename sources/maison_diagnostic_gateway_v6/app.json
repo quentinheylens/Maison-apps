@@ -1,0 +1,37 @@
+{
+  "apparmor": true,
+  "arch": [
+    "aarch64",
+    "amd64"
+  ],
+  "auth_api": false,
+  "boot": "manual",
+  "description": "Diagnostic multi-entit\u00e9s pr\u00e9par\u00e9, transport r\u00e9el et r\u00e9seau verrouill\u00e9s",
+  "docker_api": false,
+  "full_access": false,
+  "hassio_api": false,
+  "homeassistant_api": false,
+  "host_dbus": false,
+  "host_network": false,
+  "host_pid": false,
+  "ingress": false,
+  "init": false,
+  "map": [],
+  "name": "Maison Diagnostic Gateway 0.6 (simulation)",
+  "options": {
+    "execution_enabled": false,
+    "mode": "simulation",
+    "network_enabled": false
+  },
+  "ports": {},
+  "schema": {
+    "execution_enabled": "bool",
+    "mode": "list(simulation)",
+    "network_enabled": "bool"
+  },
+  "slug": "maison_diagnostic_gateway_v6",
+  "startup": "application",
+  "timeout": 30,
+  "tmpfs": true,
+  "version": "0.6.1"
+}
