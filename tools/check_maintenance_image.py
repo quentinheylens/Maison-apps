@@ -15,6 +15,8 @@ def check(image):
     with tempfile.TemporaryDirectory(prefix="maintenance-image-") as folder:
         path = Path(folder) / "options.json"
         original = {"mode": "simulation", "network_enabled": False, "execution_enabled": False}
+        path.touch(mode=0o600)
+        path.chmod(0o600)  # Supervisor options can be root-only, even for the health bootstrap.
         reports = []
         for options in (original, {**original, "mode": "real"},
                         {**original, "execution_enabled": True}, {**original, "network_enabled": True}):
@@ -48,6 +50,8 @@ def check(image):
         lifecycle.remove("--rm")
         lifecycle.insert(lifecycle.index("run") + 1, "--detach")
         lifecycle[lifecycle.index("--name") + 1] = "maintenance-lifecycle-" + uuid.uuid4().hex[:12]
+        index = lifecycle.index(image)
+        lifecycle[index:index] = ["--health-interval", "1s", "--health-start-period", "1s", "--health-timeout", "5s"]
         container = subprocess.check_output(lifecycle, text=True).strip()
         try:
             metadata = json.loads(subprocess.check_output(docker + ["inspect", container], text=True))[0]
@@ -72,6 +76,18 @@ def check(image):
                     break
                 if time.monotonic() >= deadline:
                     raise RuntimeError("simulation local health did not become ready")
+                time.sleep(0.1)
+            # Also wait for Docker's own scheduler to run the shipped command;
+            # inspecting only PID 1 or an administrative exec is insufficient.
+            while True:
+                state = json.loads(subprocess.check_output(docker + ["inspect", container], text=True))[0]["State"]
+                if state.get("Health", {}).get("Status") == "healthy":
+                    scheduled = state["Health"]["Log"][-1]
+                    assert scheduled["ExitCode"] == 0 and "synthetic-only" not in scheduled["Output"]
+                    assert json.loads(scheduled["Output"]) == health_isolation
+                    break
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("Docker-scheduled simulation health did not become ready")
                 time.sleep(0.1)
             # Freeze only the synthetic application's heartbeat, so a concurrent
             # refresh cannot conceal a forged file. All mutations stay in tmpfs.
@@ -147,7 +163,7 @@ print(json.dumps({'python':platform.python_version(),'openssl':ssl.OPENSSL_VERSI
             subprocess.run(docker + ["rm", "--force", container], capture_output=True)
         return {"minimized_runtime": minimized_runtime, "selftest": reports[0], "runtime_isolation": isolation, "healthcheck_isolation": health_isolation,
                 "unsafe_direct_healthchecks_refused": 2, "forged_heartbeats_refused": 6, "forged_activations_refused": 3,
-                "normal_simulation_health_passed": True, "clean_stop_exit_code": 0}
+                "normal_simulation_health_passed": True, "docker_scheduled_healthcheck_passed": True, "clean_stop_exit_code": 0}
 
 
 if __name__ == "__main__":

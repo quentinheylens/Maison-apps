@@ -17,12 +17,12 @@
       "sha256": "8278974f3987918207840706e83f0fb8ede4cebb84edb6dcc3824e5606e8c957"
     },
     "README.md": {
-      "bytes": 5534,
-      "sha256": "d02f73b1548a8892de0c56a61c68a7a346c054cb71f1a67bb81d5ff6a07532ff"
+      "bytes": 5864,
+      "sha256": "151bcfcbac8160ae774b052271fbd6757b1bb6ddccd3c1460032378f37c3de64"
     },
     "SECURITY.md": {
-      "bytes": 6916,
-      "sha256": "e5c5a729d9b6c7e2c235211f85b59d8b9a2aa914073ad2165d8b047d229e7d87"
+      "bytes": 27536,
+      "sha256": "454bd9e0a4485a8277fb3c913ce3d5a351cc29c20fdf3b9b744663f297f8db4a"
     },
     "catalog-policy.json": {
       "bytes": 231,
@@ -381,8 +381,8 @@
       "sha256": "a64b3e2caf079afe9057772c2a123cad91e401f130e3b0b659bc164c9ae10c49"
     },
     "tools/check_maintenance_image.py": {
-      "bytes": 10613,
-      "sha256": "43f24d2ae7600dc4e9998d6b3ee82a68861bd5a9ed5fca85a4c22f7219dbea09"
+      "bytes": 11757,
+      "sha256": "5916a2e6ffa298d8257c634bad4e711e8f34706229bc8fceb04344dd70ed889e"
     }
   },
   "format": 1

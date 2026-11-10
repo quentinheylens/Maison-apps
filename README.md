@@ -88,3 +88,10 @@ same chain. Moving the catalogue to a lower version does not force a downgrade.
 Preserve old version tags/digests and release records; no garbage collection is automated.
 
 Read [SECURITY.md](SECURITY.md) before enabling distribution.
+
+## Security remediation review
+
+See [the complete security report](SECURITY.md#result-and-residual-risk-decision)
+for the 152-row baseline triage, pinned runtime changes, native tests, remaining
+advisories and publication hold. The two applications remain sealed simulations;
+no image or store promotion is performed by this PR.
