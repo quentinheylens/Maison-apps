@@ -17,16 +17,16 @@
       "sha256": "8278974f3987918207840706e83f0fb8ede4cebb84edb6dcc3824e5606e8c957"
     },
     "README.md": {
-      "bytes": 5428,
-      "sha256": "901968291fea9cda522b8b5c22d54dbc6920989957c04fc28f5a95d15ef3f80d"
+      "bytes": 5534,
+      "sha256": "d02f73b1548a8892de0c56a61c68a7a346c054cb71f1a67bb81d5ff6a07532ff"
     },
     "SECURITY.md": {
       "bytes": 3095,
       "sha256": "5adb74859ed5839fdc89d016d2b7de425878f181f48bd746bc55b297dd29723a"
     },
     "catalog-policy.json": {
-      "bytes": 232,
-      "sha256": "0ab3316298d1d0b329fbce02a3ea3d1ba97034cb6cf2bf6b104d07dcc19b354b"
+      "bytes": 231,
+      "sha256": "2749cd8bb9fb3f4d518952db2a277d47016dd87d7eadc2d8811794eee1b91208"
     },
     "repository.yaml": {
       "bytes": 104,

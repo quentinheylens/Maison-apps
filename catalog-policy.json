@@ -1,7 +1,7 @@
 {
   "channel": "simulation",
   "format": 1,
-  "publication_enabled": false,
+  "publication_enabled": true,
   "repository": "quentinheylens/Maison-apps",
   "versions": {
     "maison_deployment_simulator": "0.1.1",

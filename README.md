@@ -1,9 +1,11 @@
 # Maison — Simulation applications
 
-This is an **initial source catalogue for review**, not an installable catalogue.
-No image has been published and no application has been promoted to the store.
-Repository: `quentinheylens/Maison-apps`. Image publication and store promotion require
-separate, explicit approvals; `publication_enabled` remains false.
+This repository separates source review, approved image publication and store
+promotion. Definitions under `sources/` are not installable store entries.
+Repository: `quentinheylens/Maison-apps`. Enabling `publication_enabled` does not
+publish an image: publication still requires a manual workflow, the exact main
+commit and explicit GitHub environment approval. Store promotion requires a
+separate reviewed pull request.
 
 Only generic code, synthetic fixtures and pinned pure-Python YAML support belong
 here. No private configuration repository, history, installation identifiers,
