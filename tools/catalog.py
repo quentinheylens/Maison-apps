@@ -106,6 +106,16 @@ def validate(root):
         raise ValueError("canonical repository required")
     inventory = read_json(root / "source-manifest.json")
     expected = ROOT_FILES | {f"sources/{slug}/{name}" for slug in APPS for name in PAYLOAD}
+    extra_promoted = set()
+    if (root / "real-diagnostic/source-manifest.json").exists():
+        import importlib.util
+        import sys
+        sys.dont_write_bytecode = True
+        spec = importlib.util.spec_from_file_location("real_extension", Path(__file__).resolve().parent / "real_catalog.py")
+        real = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(real)
+        extra, extra_promoted = real.extension(root)
+        expected |= extra
     if inventory.get("format") != 1 or set(inventory.get("files", {})) != expected:
         raise ValueError("closed source manifest required")
     present = set()
@@ -130,7 +140,7 @@ def validate(root):
                 raise ValueError("source manifest hash mismatch")
     # Policy enables publication only after a separate reviewed change. It never grants HA rights.
     promoted = {f"{slug}/{name}" for slug in APPS for name in ("config.yaml", "DOCS.md", "CHANGELOG.md")}
-    if not expected | {"source-manifest.json"} <= present or present - expected - {"source-manifest.json"} - promoted - {"release-record.json"}:
+    if not expected | {"source-manifest.json"} <= present or present - expected - {"source-manifest.json"} - promoted - extra_promoted - {"release-record.json"}:
         raise ValueError("unexpected or missing distribution files")
     for slug, (role, version) in APPS.items():
         base = root / "sources" / slug
