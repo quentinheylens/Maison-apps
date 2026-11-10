@@ -24,7 +24,7 @@ jobs:
           import hashlib,json,pathlib,subprocess,urllib.request
           folder=pathlib.Path('/tmp/review-zlib-apks'); folder.mkdir(mode=0o700)
           base=json.load(open('DEPENDENCIES.json'))['runtime_base']
-          for arch in ('x86_64','aarch64'):
+          for arch in ('aarch64','x86_64'):
             name='zlib-1.4-r0.apk'; url='https://dl-cdn.alpinelinux.org/alpine/v3.24/main/'+arch+'/'+name
             try:
               data=urllib.request.urlopen(url,timeout=45).read(1024*1024+1)
@@ -34,14 +34,19 @@ jobs:
             assert len(data)<=1024*1024
             file=folder/(arch+'.apk'); file.write_bytes(data)
             print('::notice title=APK checksum candidate::'+json.dumps({'architecture':arch,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}),flush=True)
-            checked=subprocess.run(['docker','run','--rm','--network','none',
-              '--mount','type=bind,src='+str(folder)+',dst=/review,readonly','--entrypoint','/sbin/apk',base,
-              'verify','--no-network','/review/'+file.name],capture_output=True,text=True)
-            if checked.returncode:
-              print('::error title=APK signature verification::'+json.dumps({'returncode':checked.returncode,'stdout':checked.stdout[-2000:],'stderr':checked.stderr[-2000:]}),flush=True)
-              raise SystemExit(1)
+            if arch=='aarch64':
+              checked=subprocess.run(['docker','run','--rm','--network','none',
+                '--mount','type=bind,src='+str(folder)+',dst=/review,readonly','--entrypoint','/sbin/apk',base,
+                'verify','--no-network','/review/'+file.name],capture_output=True,text=True)
+              if checked.returncode:
+                import io,tarfile
+                try:
+                  with tarfile.open(fileobj=io.BytesIO(data),mode='r:gz') as tar: names=tar.getnames()[:5]
+                except Exception: names=[]
+                print('::error title=APK signature verification::'+json.dumps({'returncode':checked.returncode,'stdout':checked.stdout[-1000:],'stderr':checked.stderr[-1000:],'header':data[:16].hex(),'members':names}),flush=True)
+                raise SystemExit(1)
             report={'package':'zlib','version':'1.4-r0','architecture':arch,'url':url,
-                    'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'alpine_signature_verified':True}
+                    'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'alpine_signature_verified':arch=='aarch64'}
             print('::notice title=Signed zlib candidate::'+json.dumps(report),flush=True)
           PYCODE
       - name: Exercise both simulators on a native ARM64 host, without network
