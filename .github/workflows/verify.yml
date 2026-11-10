@@ -107,7 +107,7 @@ jobs:
           images=json.load(open('/tmp/audit-images/tested.json'))
           targets=[(x['slug']+'-'+x['arch'],'docker-archive:/tmp/audit-images/'+x['archive']) for x in images['images']]
           targets.append(('vendored-pyyaml','sbom:'+str(output/'vendored-pyyaml.cdx.json')))
-          counts={}; high=0; reports=[]
+          counts={}; high=0; reports=[]; unique={}
           for name,target in targets:
             file=output/(name+'.json')
             subprocess.run([tool,target,'--output','json','--file',str(file)],check=True)
@@ -116,12 +116,33 @@ jobs:
               v=match['vulnerability']; a=match['artifact']; severity=v.get('severity','Unknown')
               counts[severity]=counts.get(severity,0)+1
               high += int(severity in {'High','Critical'})
-              findings.append({'id':v['id'],'severity':severity,'package':a['name'],'version':a['version'],
-                'fix':v.get('fix',{}).get('versions',[]),'type':a.get('type'),'advisory':v.get('dataSource')})
+              finding={'id':v['id'],'severity':severity,'package':a['name'],'version':a['version'],
+                'fix':v.get('fix',{}).get('versions',[]),'type':a.get('type'),'advisory':v.get('dataSource')}
+              findings.append(finding)
+              key=json.dumps(finding,sort_keys=True)
+              if key not in unique: unique[key]={'finding':finding,'targets':[]}
+              unique[key]['targets'].append(name)
             reports.append({'target':name,'matches':len(findings),'sha256':hashlib.sha256(file.read_bytes()).hexdigest()})
-            annotation('CVE '+name,findings,'warning' if findings else 'notice')
           summary={'source_commit':os.environ['GITHUB_SHA'],'scanner':'Grype 0.121.3','counts':counts,
-                   'high_or_critical_matches':high,'reports':reports,'ignore_unfixed':False,'exemptions':[]}
+                   'high_or_critical_matches':high,'reports':reports,'ignore_unfixed':False,'exemptions':[],
+                   'unique_package_vulnerability_matches':len(unique)}
+          # Public check annotations truncate at 4096 bytes. Emit deduplicated,
+          # indexed triage in smaller chunks; full reports remain in the artifact.
+          target_names=[name for name,_ in targets]; rows=[]
+          for item in unique.values():
+            f=item['finding']; rows.append([f['id'],f['package'],f['version'],f['severity'],f['fix'],f['type'],
+              [target_names.index(name) for name in item['targets']]])
+          header={'fields':['id','package','version','severity','fix','type','targets'],'target_names':target_names}
+          chunks=[]; chunk=[]
+          for row in rows:
+            if len(json.dumps({**header,'rows':chunk+[row]},separators=(',',':')))>3300 and chunk:
+              chunks.append(chunk); chunk=[]
+            chunk.append(row)
+          if chunk: chunks.append(chunk)
+          for index,chunk in enumerate(chunks[:7]):
+            annotation('CVE triage '+str(index+1),{**header,'part':index+1,'parts':len(chunks),'rows':chunk},'warning')
+          summary['triage_annotation_parts']=len(chunks)
+          summary['triage_annotations_complete']=len(chunks)<=7
           (output/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
           annotation('Vulnerability audit summary',summary,'warning' if high else 'notice')
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as stream: stream.write('```json\n'+json.dumps(summary,indent=2)+'\n```\n')
