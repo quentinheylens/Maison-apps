@@ -1,0 +1,10 @@
+{
+  "channel": "simulation",
+  "format": 1,
+  "publication_enabled": false,
+  "repository": "quentinheylens/Maison-apps",
+  "versions": {
+    "maison_deployment_simulator": "0.1.1",
+    "maison_diagnostic_gateway_v6": "0.6.1"
+  }
+}
