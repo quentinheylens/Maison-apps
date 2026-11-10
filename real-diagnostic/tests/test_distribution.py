@@ -2,6 +2,7 @@
 import copy
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 import sys
 import tempfile
@@ -68,6 +69,10 @@ class DistributionTests(unittest.TestCase):
         config=real.source_config(ROOT)
         self.assertEqual(config['map'],[{'type':'homeassistant_config','read_only':True}])
         self.assertFalse(config['options']['enabled'])
+    def test_original_catalogue_command_remains_clean_without_bytecode_flags(self):
+        result=subprocess.run([sys.executable,'-I',str(ROOT/'tools/catalog.py'),'validate','--root',str(ROOT)],capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        self.assertFalse((ROOT/'tools/__pycache__').exists())
     def test_archive_hash_mismatch_is_refused_before_docker_load(self):
         with tempfile.TemporaryDirectory() as folder:
             path=Path(folder)/'real-amd64.tar';path.write_bytes(b'untrusted')

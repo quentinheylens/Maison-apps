@@ -109,6 +109,8 @@ def validate(root):
     extra_promoted = set()
     if (root / "real-diagnostic/source-manifest.json").exists():
         import importlib.util
+        import sys
+        sys.dont_write_bytecode = True
         spec = importlib.util.spec_from_file_location("real_extension", root / "tools/real_catalog.py")
         real = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(real)
