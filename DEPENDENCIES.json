@@ -1,6 +1,15 @@
 {
   "format": 1,
-  "runtime_base": "python:3.12-alpine3.22@sha256:a190708a2dec1bd18b1decb539f8e8f5407abaa9bf39cacda583f7f8c11db322",
+  "runtime_base": "python:3.12.16-alpine3.24@sha256:e064671ca452259bab50e8e2c7bd896e39e9a343bb06ca25234adf6fe18d0fc7",
+  "runtime_provenance": {
+    "commit": "3d7e95597e56a415d9e4abc0f15877e005d2cb2e",
+    "directory": "3.12/alpine3.24",
+    "platform_manifests": {
+      "amd64": "sha256:a61cbd76a882645de7f91423329fe43a67eed60d7da24f9e5331414bb3618b20",
+      "arm64": "sha256:218ad6ba54faeb7f1089f391c597a80c9d69ca88e561f71ebd77fb452d39249b"
+    },
+    "upstream": "https://github.com/docker-library/python"
+  },
   "vendored": {
     "license": "MIT",
     "license_sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4",

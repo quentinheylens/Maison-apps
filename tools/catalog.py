@@ -15,7 +15,7 @@ import zipfile
 APPS = {"maison_diagnostic_gateway_v6": ("diagnostic", "0.6.1"),
         "maison_deployment_simulator": ("deployment", "0.1.1")}
 ARCHES = {"aarch64": "arm64", "amd64": "amd64"}
-BASE = "python:3.12-alpine3.22@sha256:a190708a2dec1bd18b1decb539f8e8f5407abaa9bf39cacda583f7f8c11db322"
+BASE = "python:3.12.16-alpine3.24@sha256:e064671ca452259bab50e8e2c7bd896e39e9a343bb06ca25234adf6fe18d0fc7"
 FLAGS = "homeassistant_api hassio_api auth_api docker_api host_network host_pid host_dbus full_access ingress".split()
 GATEWAY = "__init__ audit bounded_audit data_source policy real_source redaction service simulation_entrypoint".split()
 MAINTENANCE = "__init__ code_index diagnostics entrypoint evidence fixtures network_lock plan private_audit runtime safe_fs transactions".split()
@@ -65,7 +65,7 @@ def recipe(role):
             "COPY yaml /app/yaml\nCOPY PyYAML-LICENSE /app/PyYAML-LICENSE\n"
             "COPY installation-profile.json /app/installation-profile.json\nCOPY healthcheck.py /app/healthcheck.py\n"
             f"ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 MAISON_ROLE={role}\n"
-            'HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD ["python3", "/app/healthcheck.py"]\n'
+            'HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD ["python3", "-m", "maintenance.entrypoint", "healthcheck"]\n'
             f'ENTRYPOINT ["python3", "-m", "maintenance.entrypoint", "{role}"]\n').encode()
 
 
@@ -201,6 +201,10 @@ def check_image_archive(path, root, slug, arch, commit, image_id):
         expected_labels = {"io.hass.version": version, "io.hass.type": "app", "io.hass.arch": arch,
             "org.opencontainers.image.source": "https://github.com/" + read_json(Path(root) / "catalog-policy.json")["repository"],
             "org.opencontainers.image.revision": commit, "org.opencontainers.image.version": version}
+        if (config["config"].get("Healthcheck", {}).get("Test") !=
+                ["CMD", "python3", "-m", "maintenance.entrypoint", "healthcheck"]
+                or config["config"].get("Entrypoint") != ["python3", "-m", "maintenance.entrypoint", APPS[slug][0]]):
+            raise ValueError("unreviewed healthcheck or application entrypoint")
         env = config["config"].get("Env", [])
         env_keys = {value.split("=", 1)[0] for value in env}
         if (labels != expected_labels or env_keys != {"PATH", "LANG", "GPG_KEY", "PYTHON_VERSION", "PYTHON_SHA256",

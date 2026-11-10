@@ -50,14 +50,60 @@ def check(image):
         lifecycle[lifecycle.index("--name") + 1] = "maintenance-lifecycle-" + uuid.uuid4().hex[:12]
         container = subprocess.check_output(lifecycle, text=True).strip()
         try:
+            metadata = json.loads(subprocess.check_output(docker + ["inspect", container], text=True))[0]
+            health_command = metadata["Config"]["Healthcheck"]["Test"]
+            assert health_command == ["CMD", "python3", "-m", "maintenance.entrypoint", "healthcheck"]
+            # Direct probes must fail, both as root and as an unprivileged user
+            # with the synthetic credentials still inherited from Docker exec.
+            role = reports[0]["role"]
+            for user in ("0:0", "65532:65532"):
+                refused = subprocess.run(docker + ["exec", "--user", user, container,
+                    "python3", "/app/healthcheck.py", role], capture_output=True, text=True)
+                assert refused.returncode == 1 and "synthetic-only" not in refused.stdout + refused.stderr
             deadline = time.monotonic() + 15
             while True:
-                health = subprocess.run(docker + ["exec", container, "python3", "/app/healthcheck.py"], capture_output=True)
+                health = subprocess.run(docker + ["exec", container, *health_command[1:]], capture_output=True)
                 if health.returncode == 0:
+                    health_isolation = json.loads(health.stdout)
+                    assert health_isolation == {"healthy": True, "uid": 65532, "gid": 65532,
+                        "capabilities_zero": True, "credential_environment_clean": True,
+                        "no_new_privileges": True, "network_syscalls_denied": True}
+                    assert b"synthetic-only" not in health.stdout + health.stderr
                     break
                 if time.monotonic() >= deadline:
                     raise RuntimeError("simulation local health did not become ready")
                 time.sleep(0.1)
+            # Freeze only the synthetic application's heartbeat, so a concurrent
+            # refresh cannot conceal a forged file. All mutations stay in tmpfs.
+            subprocess.run(docker + ["kill", "--signal", "STOP", container], check=True, capture_output=True)
+            try:
+                folder = "diagnostic-v6" if role == "diagnostic" else "deploy-simulation"
+                file = "/tmp/" + folder + "/health.json"
+                original_health = subprocess.check_output(docker + ["exec", "--user", "65532:65532", container,
+                    "python3", "-c", "import pathlib,sys;sys.stdout.buffer.write(pathlib.Path(sys.argv[1]).read_bytes())", file])
+                for attack in ("stale", "future", "oversize", "symlink", "hardlink", "unsafe_flags"):
+                    forge = """import json,os,pathlib,sys,time
+p=pathlib.Path(sys.argv[1]); attack=sys.argv[2]
+if attack=='stale': os.utime(p,(time.time()-60,)*2)
+elif attack=='future': os.utime(p,(time.time()+60,)*2)
+elif attack=='oversize': p.write_bytes(b'x'*4097)
+elif attack=='symlink': p.unlink(); p.symlink_to('/data/options.json')
+elif attack=='hardlink': os.link(p,str(p)+'.link')
+elif attack=='unsafe_flags':
+ r=json.loads(p.read_bytes()); r['writes_enabled']=True; p.write_text(json.dumps(r))
+"""
+                    subprocess.run(docker + ["exec", "--user", "65532:65532", container,
+                        "python3", "-c", forge, file, attack], check=True, capture_output=True)
+                    rejected = subprocess.run(docker + ["exec", container, *health_command[1:]], capture_output=True)
+                    assert rejected.returncode == 1, "unsafe heartbeat accepted: " + attack
+                    restore = """import pathlib,sys
+p=pathlib.Path(sys.argv[1]); p.unlink(); pathlib.Path(str(p)+'.link').unlink(missing_ok=True); p.write_bytes(sys.stdin.buffer.read())
+"""
+                    subprocess.run(docker + ["exec", "--interactive", "--user", "65532:65532", container,
+                        "python3", "-c", restore, file], input=original_health, check=True, capture_output=True)
+                assert subprocess.run(docker + ["exec", container, *health_command[1:]], capture_output=True).returncode == 0
+            finally:
+                subprocess.run(docker + ["kill", "--signal", "CONT", container], check=True, capture_output=True)
             # Inspect the shipped PID 1, not the separate Docker-exec collector:
             # an administrative exec does not inherit the runtime's seccomp filter.
             probe = """import json,pathlib
@@ -89,7 +135,8 @@ print(json.dumps({'runtime_capabilities_zero':True,'no_new_privileges':True,'sec
             assert state["ExitCode"] == 0
         finally:
             subprocess.run(docker + ["rm", "--force", container], capture_output=True)
-        return {"selftest": reports[0], "runtime_isolation": isolation, "forged_activations_refused": 3,
+        return {"selftest": reports[0], "runtime_isolation": isolation, "healthcheck_isolation": health_isolation,
+                "unsafe_direct_healthchecks_refused": 2, "forged_heartbeats_refused": 6, "forged_activations_refused": 3,
                 "normal_simulation_health_passed": True, "clean_stop_exit_code": 0}
 
 

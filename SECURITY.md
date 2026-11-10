@@ -48,3 +48,41 @@ of the original code and retain dependency notices before public release.
 
 No `pull_request_target`, repository dispatch, scheduled publication, `latest`
 tag, automatic promotion, installation or production update is provided.
+
+## Security remediation — 2026-11-10
+
+The initial Grype audit of commit `85fe37a` found **152 package/advisory
+matches per image** (9 Critical, 64 High, 58 Medium, 20 Low, 1 Negligible).
+The same set occurred in all four images: 608 matches are not 608 distinct
+vulnerabilities. There were 111 literal advisory identifiers (105 CVE,
+6 GHSA); aliases are not assumed independent or falsely classified as fixed.
+OpenSSL findings repeat for libcrypto/libssl and BusyBox for its split packages.
+59 of 73 High/Critical package matches had a recorded fix; 14 High matches
+(SQLite and Python) did not in that database. No exploit was demonstrated and
+no advisory has been waived as a false positive.
+
+The base is updated to official **Python 3.12.16 / Alpine 3.24**, pinned by
+multiarchitecture index digest in `DEPENDENCIES.json`, with upstream build
+commit and both architecture manifests. This retains the Python 3.12 API
+rather than introducing an unnecessary minor-version migration. No moving
+`apk upgrade`, third-party base or unpinned dependency installer is added.
+The base's PSF/system-package licences still apply; vendored PyYAML 6.0.3
+and its MIT licence are unchanged and hash checked.
+
+The Docker healthcheck now invokes the same bootstrap as PID 1. A short root
+bootstrap reads Supervisor's potentially root-only options, locks networking,
+then drops supplementary groups and UID/GID to 65532 and **execs with a clean
+environment**. The actual probe checks its own UID/GID, all capability sets,
+NoNewPrivs, seccomp and initial process environment; direct root/dirty-env
+invocation fails. Heartbeat reads use descriptor-relative NOFOLLOW, regular
+single-link files, a 4096-byte bound and age 0–30 seconds. Stale/future,
+oversized, linked and unsafe-flags files are regression tested on both native
+architectures. Docker has no non-root USER declaration because the options
+bootstrap needs that brief root phase; this is a documented residual boundary,
+not a claim that no process ever starts as root.
+
+All vulnerability findings remain reported. High/Critical findings fail the
+required `offline-build` gate, including unfixed findings. There are **no
+exemptions** and no `ignore-unfixed` flag. Fresh Grype and native results must
+be reviewed for the exact final PR revision before publication. No image,
+store metadata or Home Assistant installation is published by these tests.

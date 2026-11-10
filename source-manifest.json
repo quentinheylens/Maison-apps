@@ -9,8 +9,8 @@
       "sha256": "5e148360f40fe68d6e871c33e7f228523d002b0576fb364d50bb4fdafafc046a"
     },
     "DEPENDENCIES.json": {
-      "bytes": 2075,
-      "sha256": "8f9953feba5fbdb7600d39233222db331686a63376432a33c5e034a770b17657"
+      "bytes": 2476,
+      "sha256": "a36caf07e98e7af7dfa23a7aa1684537291599d0bbe07bbe45a57a1b7add21a9"
     },
     "NOTICE.md": {
       "bytes": 1508,
@@ -21,8 +21,8 @@
       "sha256": "d02f73b1548a8892de0c56a61c68a7a346c054cb71f1a67bb81d5ff6a07532ff"
     },
     "SECURITY.md": {
-      "bytes": 3095,
-      "sha256": "5adb74859ed5839fdc89d016d2b7de425878f181f48bd746bc55b297dd29723a"
+      "bytes": 5488,
+      "sha256": "89a8b23f85aa6f2fda28791d90a1fb61e05d524414c5be57c5a3ae91dd5b0237"
     },
     "catalog-policy.json": {
       "bytes": 231,
@@ -33,8 +33,8 @@
       "sha256": "492d06b94d56b3831253f3699ccbfe766e1fec038bf6db54c618caf8fbaff06e"
     },
     "sources/maison_deployment_simulator/Dockerfile": {
-      "bytes": 574,
-      "sha256": "543d80884ea6f8b9d02b7b82d59d035de8f8d739af643a972d4f7b1822255342"
+      "bytes": 601,
+      "sha256": "feaae319ca5bdb6acceb71c69a933cdc335f176c1501539e016d18e7f29f8889"
     },
     "sources/maison_deployment_simulator/PyYAML-LICENSE": {
       "bytes": 1101,
@@ -81,8 +81,8 @@
       "sha256": "20679b93c3c9fcff6efe66b7bb1f0dff0404b14e8ddb0324be32e15bf6d1282d"
     },
     "sources/maison_deployment_simulator/healthcheck.py": {
-      "bytes": 513,
-      "sha256": "bfe404f5520bf51daf580ca99286e77e6d6ca4f2aa66f9def66be93ac1c9bb81"
+      "bytes": 3094,
+      "sha256": "806d9a3fd4643c9c82270883e8fc06a316dba91e38f1cb798ef431afbf45ec04"
     },
     "sources/maison_deployment_simulator/installation-profile.json": {
       "bytes": 67,
@@ -101,8 +101,8 @@
       "sha256": "a1b5864540aac5cec331b450390e00282639378a2e0d68c8075d52fc93ab4539"
     },
     "sources/maison_deployment_simulator/maintenance/entrypoint.py": {
-      "bytes": 1889,
-      "sha256": "d42a875d6cdec28c8821e35ee481276d7be9d2d2839840b306f8f3e58c2d351d"
+      "bytes": 2202,
+      "sha256": "8a26caaea8300071261fdce599196d60bf9d24538d219859ad39a30d60c944e9"
     },
     "sources/maison_deployment_simulator/maintenance/evidence.py": {
       "bytes": 3248,
@@ -205,8 +205,8 @@
       "sha256": "953408cd2570f0c83dc2fe39f7e4e388e41eeb05738aa69196a5f6ffcf6ba79e"
     },
     "sources/maison_diagnostic_gateway_v6/Dockerfile": {
-      "bytes": 574,
-      "sha256": "caabf86f58533fee0a009983d6f8fb69f20972d87563b9451185973599cd7899"
+      "bytes": 601,
+      "sha256": "55b83dbe38d34d5d31dae296c2e542721af799fd5d29dbfe6c527edf2fb3e9bf"
     },
     "sources/maison_diagnostic_gateway_v6/PyYAML-LICENSE": {
       "bytes": 1101,
@@ -253,8 +253,8 @@
       "sha256": "20679b93c3c9fcff6efe66b7bb1f0dff0404b14e8ddb0324be32e15bf6d1282d"
     },
     "sources/maison_diagnostic_gateway_v6/healthcheck.py": {
-      "bytes": 513,
-      "sha256": "bfe404f5520bf51daf580ca99286e77e6d6ca4f2aa66f9def66be93ac1c9bb81"
+      "bytes": 3094,
+      "sha256": "806d9a3fd4643c9c82270883e8fc06a316dba91e38f1cb798ef431afbf45ec04"
     },
     "sources/maison_diagnostic_gateway_v6/installation-profile.json": {
       "bytes": 67,
@@ -273,8 +273,8 @@
       "sha256": "a1b5864540aac5cec331b450390e00282639378a2e0d68c8075d52fc93ab4539"
     },
     "sources/maison_diagnostic_gateway_v6/maintenance/entrypoint.py": {
-      "bytes": 1889,
-      "sha256": "d42a875d6cdec28c8821e35ee481276d7be9d2d2839840b306f8f3e58c2d351d"
+      "bytes": 2202,
+      "sha256": "8a26caaea8300071261fdce599196d60bf9d24538d219859ad39a30d60c944e9"
     },
     "sources/maison_diagnostic_gateway_v6/maintenance/evidence.py": {
       "bytes": 3248,
@@ -377,12 +377,12 @@
       "sha256": "953408cd2570f0c83dc2fe39f7e4e388e41eeb05738aa69196a5f6ffcf6ba79e"
     },
     "tools/catalog.py": {
-      "bytes": 28342,
-      "sha256": "97b0d2aea972c60c384978c0025c2dc208168bf3af15fcff7906c6b95917d5c4"
+      "bytes": 28717,
+      "sha256": "a4d6dd4a0401b2c97e84c3b68374473e3ce4c50fce90189a74e2c2dff6285f30"
     },
     "tools/check_maintenance_image.py": {
-      "bytes": 6128,
-      "sha256": "0070b1e83805906bf3423ec32be06b9cc3d2441c26b95e6c49c0638caae01fc1"
+      "bytes": 9824,
+      "sha256": "013ea45240a66bf8dc453662c590b31b249e3b696b044fafd7ed6b2f8df358fa"
     }
   },
   "format": 1

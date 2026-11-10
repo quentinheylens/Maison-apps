@@ -28,6 +28,12 @@ def drop_privileges():
 
 def main():
     args = sys.argv[1:]
+    healthcheck = args == ["healthcheck"]
+    if healthcheck:
+        role = os.environ.get("MAISON_ROLE")
+        if role not in {"diagnostic", "deployment"}:
+            raise ValueError("invalid healthcheck role")
+        args = [role]
     if args not in (["diagnostic"], ["deployment"], ["diagnostic", "--self-test-only"], ["deployment", "--self-test-only"]):
         raise ValueError("invalid simulation arguments")
     lock_network()
@@ -40,7 +46,8 @@ def main():
     if profile != {"role": args[0], "production_capable": False, "simulation": True} or profile.get("production_capable") is not False or profile.get("simulation") is not True:
         raise ValueError("installed profile does not permit production")
     drop_privileges()
-    os.execve(sys.executable, [sys.executable, "-m", "maintenance.runtime", *args], clean_environment())
+    target = ["/app/healthcheck.py", *args] if healthcheck else ["-m", "maintenance.runtime", *args]
+    os.execve(sys.executable, [sys.executable, *target], clean_environment())
 
 
 if __name__ == "__main__":
