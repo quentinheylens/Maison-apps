@@ -26,12 +26,20 @@ jobs:
           base=json.load(open('DEPENDENCIES.json'))['runtime_base']
           for arch in ('x86_64','aarch64'):
             name='zlib-1.4-r0.apk'; url='https://dl-cdn.alpinelinux.org/alpine/v3.24/main/'+arch+'/'+name
-            data=urllib.request.urlopen(url,timeout=45).read(1024*1024+1)
+            try:
+              data=urllib.request.urlopen(url,timeout=45).read(1024*1024+1)
+            except Exception as error:
+              print('::error title=Fixed APK download::'+json.dumps({'architecture':arch,'error':type(error).__name__,'http_status':getattr(error,'code',None)}),flush=True)
+              raise
             assert len(data)<=1024*1024
             file=folder/(arch+'.apk'); file.write_bytes(data)
-            subprocess.run(['docker','run','--rm','--network','none','--read-only',
+            print('::notice title=APK checksum candidate::'+json.dumps({'architecture':arch,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}),flush=True)
+            checked=subprocess.run(['docker','run','--rm','--network','none',
               '--mount','type=bind,src='+str(folder)+',dst=/review,readonly','--entrypoint','/sbin/apk',base,
-              'verify','--no-network','/review/'+file.name],check=True)
+              'verify','--no-network','/review/'+file.name],capture_output=True,text=True)
+            if checked.returncode:
+              print('::error title=APK signature verification::'+json.dumps({'returncode':checked.returncode,'stdout':checked.stdout[-2000:],'stderr':checked.stderr[-2000:]}),flush=True)
+              raise SystemExit(1)
             report={'package':'zlib','version':'1.4-r0','architecture':arch,'url':url,
                     'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'alpine_signature_verified':True}
             print('::notice title=Signed zlib candidate::'+json.dumps(report),flush=True)
