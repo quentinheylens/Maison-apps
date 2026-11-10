@@ -381,8 +381,8 @@
       "sha256": "97b0d2aea972c60c384978c0025c2dc208168bf3af15fcff7906c6b95917d5c4"
     },
     "tools/check_maintenance_image.py": {
-      "bytes": 3930,
-      "sha256": "60bacb7dc2670a433f5e6161e6b642451405f8e5dd52ea52d25ad781ec5c5e40"
+      "bytes": 6128,
+      "sha256": "0070b1e83805906bf3423ec32be06b9cc3d2441c26b95e6c49c0638caae01fc1"
     }
   },
   "format": 1

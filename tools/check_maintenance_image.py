@@ -58,12 +58,38 @@ def check(image):
                 if time.monotonic() >= deadline:
                     raise RuntimeError("simulation local health did not become ready")
                 time.sleep(0.1)
+            # Inspect the shipped PID 1, not the separate Docker-exec collector:
+            # an administrative exec does not inherit the runtime's seccomp filter.
+            probe = """import json,pathlib
+fields=dict(line.split(':',1) for line in pathlib.Path('/proc/1/status').read_text().splitlines() if ':' in line)
+assert fields['Uid'].split()==['65532']*4 and fields['Gid'].split()==['65532']*4
+assert fields['Groups'].split()==[]
+assert all(int(fields[name].strip(),16)==0 for name in ('CapEff','CapPrm','CapInh','CapAmb'))
+assert fields['NoNewPrivs'].strip()=='1' and fields['Seccomp'].strip()=='2'
+assert not pathlib.Path('/config').exists() and not pathlib.Path('/var/run/docker.sock').exists()
+assert not any(key+b'=' in pathlib.Path('/proc/1/environ').read_bytes() for key in
+ (b'SUPERVISOR_TOKEN',b'HASSIO_TOKEN',b'MAISON_GATEWAY_TOKEN',b'TS_AUTHKEY'))
+print(json.dumps({'runtime_capabilities_zero':True,'no_new_privileges':True,'seccomp_active':True,
+ 'production_config_absent':True,'docker_socket_absent':True,'inherited_credentials_absent':True}))
+"""
+            isolation = json.loads(subprocess.check_output(docker + ["exec", "--user", "65532:65532", container,
+                                                                     "python3", "-c", probe], text=True))
+            metadata = json.loads(subprocess.check_output(docker + ["inspect", container], text=True))[0]
+            host = metadata["HostConfig"]
+            assert host["Privileged"] is False and host["ReadonlyRootfs"] is True
+            assert host["NetworkMode"] == "none" and host["PidMode"] != "host"
+            assert not host.get("CapAdd") and not host.get("Devices")
+            assert not metadata["Config"].get("ExposedPorts")
+            assert all(mount["Destination"] in {"/data/options.json", "/tmp"} for mount in metadata["Mounts"])
+            assert all(not mount["RW"] for mount in metadata["Mounts"] if mount["Destination"] == "/data/options.json")
+            isolation.update({"container_unprivileged": True, "rootfs_read_only": True,
+                              "network_namespace_none": True, "mounts_limited_to_synthetic_options_and_tmp": True})
             subprocess.run(docker + ["stop", "--time", "10", container], check=True, capture_output=True)
             state = json.loads(subprocess.check_output(docker + ["inspect", container], text=True))[0]["State"]
             assert state["ExitCode"] == 0
         finally:
             subprocess.run(docker + ["rm", "--force", container], capture_output=True)
-        return {"selftest": reports[0], "forged_activations_refused": 3,
+        return {"selftest": reports[0], "runtime_isolation": isolation, "forged_activations_refused": 3,
                 "normal_simulation_health_passed": True, "clean_stop_exit_code": 0}
 
 
