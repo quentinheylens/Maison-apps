@@ -1,0 +1,54 @@
+{
+  "apparmor": true,
+  "arch": [
+    "aarch64",
+    "amd64"
+  ],
+  "auth_api": false,
+  "boot": "manual",
+  "breaking_versions": [
+    "0.8.0"
+  ],
+  "description": "\u00c9tats r\u00e9els, historiques, code et traces, lecture authentifi\u00e9e sans commandes",
+  "docker_api": false,
+  "full_access": false,
+  "hassio_api": false,
+  "homeassistant_api": true,
+  "host_dbus": false,
+  "host_network": false,
+  "host_pid": false,
+  "image": "ghcr.io/quentinheylens/maison-apps/maison_diagnostic_real_v8",
+  "ingress": false,
+  "init": false,
+  "map": [
+    {
+      "read_only": true,
+      "type": "homeassistant_config"
+    }
+  ],
+  "name": "Maison Diagnostic r\u00e9el",
+  "options": {
+    "acl_reviewed": false,
+    "client_token": "",
+    "enabled": false,
+    "read_approved": false,
+    "redact_terms": [],
+    "tailscale_auth_key": ""
+  },
+  "ports": {},
+  "schema": {
+    "acl_reviewed": "bool",
+    "client_token": "password",
+    "enabled": "bool",
+    "read_approved": "bool",
+    "redact_terms": [
+      "str"
+    ],
+    "tailscale_auth_key": "password"
+  },
+  "slug": "maison_diagnostic_real_v8",
+  "startup": "application",
+  "timeout": 30,
+  "tmpfs": true,
+  "version": "0.8.0"
+}
