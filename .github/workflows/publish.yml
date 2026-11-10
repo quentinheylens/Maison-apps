@@ -16,7 +16,13 @@ concurrency:
   group: catalogue-publication
   cancel-in-progress: false
 jobs:
+  prepublication-validation:
+    if: github.repository == 'quentinheylens/Maison-apps' && github.ref == 'refs/heads/main' && github.event.repository.private == false
+    uses: ./.github/workflows/verify.yml
+    permissions:
+      contents: read
   build-tested:
+    needs: prepublication-validation
     if: github.repository == 'quentinheylens/Maison-apps' && github.ref == 'refs/heads/main' && github.event.repository.private == false
     runs-on: ubuntu-latest
     timeout-minutes: 30

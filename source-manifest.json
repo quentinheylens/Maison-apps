@@ -1,12 +1,12 @@
 {
   "files": {
     ".github/workflows/publish.yml": {
-      "bytes": 5445,
-      "sha256": "d8015a03170af8334c33b8bc78a05ddc02ec44ddfa049c748bdb6a79d501454d"
+      "bytes": 5727,
+      "sha256": "6f9f409c671d29d23ec7b4906e57c7babf6694145379b4b2eec005580c7d6511"
     },
     ".github/workflows/verify.yml": {
-      "bytes": 10935,
-      "sha256": "3dc84056b566b36a271722208188de457739d8252d2df8e1501004577b231302"
+      "bytes": 10952,
+      "sha256": "5e148360f40fe68d6e871c33e7f228523d002b0576fb364d50bb4fdafafc046a"
     },
     "DEPENDENCIES.json": {
       "bytes": 2075,
