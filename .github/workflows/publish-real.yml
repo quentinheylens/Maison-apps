@@ -1,0 +1,103 @@
+name: Publish reviewed real read-only diagnostic
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Exact reviewed public main commit (40 lowercase hex characters)
+        type: string
+        required: true
+      confirmation:
+        description: PUBLISH-REAL-READ- followed by the exact public commit
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: catalogue-publication
+  cancel-in-progress: false
+jobs:
+  require-manual-source:
+    if: github.repository == 'quentinheylens/Maison-apps' && github.ref == 'refs/heads/main' && github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REVIEWED_COMMIT: ${{ inputs.source_commit }}
+      PUBLICATION_CONFIRMATION: ${{ inputs.confirmation }}
+      CATALOG_PROTECTED_ENVIRONMENT: catalog-publication
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check the exact main commit and existing reviewer/bypass protections
+        run: |
+          python3 -I -B - <<'PY'
+          import importlib.util,os
+          spec=importlib.util.spec_from_file_location('real','tools/real_catalog.py')
+          real=importlib.util.module_from_spec(spec);spec.loader.exec_module(real)
+          real.validate('.')
+          real.publication_allowed('.',os.environ['REVIEWED_COMMIT'],os.environ['PUBLICATION_CONFIRMATION'],os.environ)
+          PY
+  validate-tested-images:
+    needs: require-manual-source
+    uses: ./.github/workflows/verify-real.yml
+    permissions:
+      contents: read
+  publish-approved:
+    needs: validate-tested-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: catalog-publication
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REVIEWED_COMMIT: ${{ inputs.source_commit }}
+      PUBLICATION_CONFIRMATION: ${{ inputs.confirmation }}
+      CATALOG_PROTECTED_ENVIRONMENT: catalog-publication
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: real-tested-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-*
+          path: /tmp/real-tested
+          merge-multiple: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: real-audit-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/real-audit
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - id: release
+        name: Publish exactly the audited native images, never replace a version
+        run: python3 -I -B tools/real_catalog.py publish --root . --commit "$REVIEWED_COMMIT" --confirmation "$PUBLICATION_CONFIRMATION" --artifacts /tmp/real-tested --audit /tmp/real-audit/summary.json --output /tmp/real-release
+      - id: subject
+        run: |
+          python3 -I - <<'PY'
+          import json,os
+          image=json.load(open('/tmp/real-release/release-record.json'))['images']['maison_diagnostic_real_v8']
+          with open(os.environ['GITHUB_OUTPUT'],'a') as stream:
+            stream.write('name='+image['image']+'\ndigest='+image['digest']+'\n')
+          PY
+      - uses: actions/attest-build-provenance@96b4a1ef7235a096b17240c259729fdd70c83d45
+        with:
+          subject-name: ${{ steps.subject.outputs.name }}
+          subject-digest: ${{ steps.subject.outputs.digest }}
+          push-to-registry: true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.release.outcome == 'success'
+        with:
+          name: real-release-record-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/real-release/release-record.json
+          retention-days: 30
+          if-no-files-found: error
+      # A separate promotion PR verifies public anonymous access, exact digests,
+      # and provenance for this workflow/commit/run. No installation or HA access.

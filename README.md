@@ -95,3 +95,11 @@ See [the complete security report](SECURITY.md#result-and-residual-risk-decision
 for the 152-row baseline triage, pinned runtime changes, native tests, remaining
 advisories and publication hold. The two applications remain sealed simulations;
 no image or store promotion is performed by this PR.
+
+## Real read-only diagnostics (separate 0.8.0 distribution)
+
+Maison Diagnostic réel is a separate dormant application; it preserves both
+simulators and the existing Read Gateway 0.5/Tailscale installations. Its source,
+manual protected publication, native tests, exact-artifact CVE audit and separate
+promotion protocol are documented in [real-diagnostic/README.md](real-diagnostic/README.md).
+It contains generic software only, never household configuration or credentials.

@@ -1,0 +1,8 @@
+{
+  "format": 1,
+  "mode": "real-read-only",
+  "publication_enabled": true,
+  "repository": "quentinheylens/Maison-apps",
+  "slug": "maison_diagnostic_real_v8",
+  "version": "0.8.0"
+}

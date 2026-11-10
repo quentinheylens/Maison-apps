@@ -1,8 +1,16 @@
 {
   "files": {
+    ".github/workflows/publish-real.yml": {
+      "bytes": 4471,
+      "sha256": "e9ae049116f5195300d1891107d23c194fcb8becea603cd93438fe5185ffa0d7"
+    },
     ".github/workflows/publish.yml": {
       "bytes": 5960,
       "sha256": "b279bc4c6ad04fd163a1148852d9f91f5d0668dd7af9f321cdab3d7e0296881e"
+    },
+    ".github/workflows/verify-real.yml": {
+      "bytes": 2826,
+      "sha256": "ee978e264f3802072e6971ac4c2ceb8145e5552c13ca573d0da3ac9f03061694"
     },
     ".github/workflows/verify.yml": {
       "bytes": 11418,
@@ -17,8 +25,8 @@
       "sha256": "8278974f3987918207840706e83f0fb8ede4cebb84edb6dcc3824e5606e8c957"
     },
     "README.md": {
-      "bytes": 5864,
-      "sha256": "151bcfcbac8160ae774b052271fbd6757b1bb6ddccd3c1460032378f37c3de64"
+      "bytes": 6341,
+      "sha256": "4c7608f1c7411f89cf6a53ea8cb395def9742ad9605db06cd4c7e563e606cb99"
     },
     "SECURITY.md": {
       "bytes": 27536,
@@ -27,6 +35,26 @@
     "catalog-policy.json": {
       "bytes": 231,
       "sha256": "2749cd8bb9fb3f4d518952db2a277d47016dd87d7eadc2d8811794eee1b91208"
+    },
+    "real-diagnostic/README.md": {
+      "bytes": 3595,
+      "sha256": "7a68b6a2bbc3e61545d7aefb233dc10f991028c5963a14801c8fe3e0c94fb508"
+    },
+    "real-diagnostic/policy.json": {
+      "bytes": 184,
+      "sha256": "f934166b4763f90175199bab788535547235f94ecc24dd61625ce46db9c80054"
+    },
+    "real-diagnostic/source-manifest.json": {
+      "bytes": 5979,
+      "sha256": "e4dda2a1e1d71b654b286ae64332fb03d04c71c8cee58f97d66aac4ffd59490f"
+    },
+    "real-diagnostic/tests/test_distribution.py": {
+      "bytes": 5112,
+      "sha256": "10211acfe5f8ef039aa68f96280730887e2a1751861f806ff26fa5b24e89fead"
+    },
+    "real-diagnostic/tests/test_read_boundary.py": {
+      "bytes": 17776,
+      "sha256": "b126f7343547905663d4f783793ec8339f17f38d09b804f7be674e37ce2e00d1"
     },
     "repository.yaml": {
       "bytes": 104,
@@ -376,13 +404,129 @@
       "bytes": 2573,
       "sha256": "953408cd2570f0c83dc2fe39f7e4e388e41eeb05738aa69196a5f6ffcf6ba79e"
     },
+    "sources/maison_diagnostic_real_v8/DOCS.md": {
+      "bytes": 4332,
+      "sha256": "0528e1a9db6a22a53a82f7040619a700fb10f55ce2fe4653d0ca3866c239c46a"
+    },
+    "sources/maison_diagnostic_real_v8/Dockerfile": {
+      "bytes": 2458,
+      "sha256": "8ffa1c18e0e11fbef386fb52b74effc0e17952a032c044a6f322cd04dceb87df"
+    },
+    "sources/maison_diagnostic_real_v8/config.yaml": {
+      "bytes": 1194,
+      "sha256": "bd96df6432829baa5c1d87424c16da472d1b6f61ed93f55b6520f2a31c5420cc"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/__init__.py": {
+      "bytes": 103,
+      "sha256": "77d3cecc0265b2d326abeed916e04ef012a7595c2adc5e4b965fc6344e9edd40"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/entrypoint.py": {
+      "bytes": 1629,
+      "sha256": "ecfe997863b8123184420ef0b86190297578a2ee5b4cc5d6a990fe2dcc70b832"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/files.py": {
+      "bytes": 8946,
+      "sha256": "66d2b6901a4726a13ebbad115f2cce5737394f508d868d3ff20a3829c95409d3"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/privacy.py": {
+      "bytes": 2191,
+      "sha256": "b364c63fffb695cac2fd563b0d8e23418f9ee3cf2ce9bf4f4c427c4f7321c3a0"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/reader.py": {
+      "bytes": 8176,
+      "sha256": "5ec170f5d6b042b906f10e9605a7c90f7e93c6f2242632e6140545e4a0a5e3ca"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/runtime.py": {
+      "bytes": 5722,
+      "sha256": "b9e6132478d022bb19ed2a433129d76cf4029d9a6c628b6df6e730a9047a1ba9"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/service.py": {
+      "bytes": 6062,
+      "sha256": "da0f58774175a22d55fb8c570944e18ed765606e0248b5c8c991069943962a4f"
+    },
+    "sources/maison_diagnostic_real_v8/diagnostic_real/source.py": {
+      "bytes": 9481,
+      "sha256": "4de94fa6fcda141c720c9029be2c1c5abcf55e076866ae3d005cfe19b0e0280c"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/__init__.py": {
+      "bytes": 100,
+      "sha256": "633d9acb718d30bf485ce518f5fe0c20b648d8635c1421410c47170204afdde2"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/audit.py": {
+      "bytes": 4628,
+      "sha256": "f5fd37597f8b124bbd1f2ef463d2ac9abac48520617f39d83b3527244c1a8ab9"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/bounded_audit.py": {
+      "bytes": 1100,
+      "sha256": "2e0f2aa628e7a732683d2e1b4f7efdc1a4023ae1fb11df5e27a43ac45fc0895a"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/data_source.py": {
+      "bytes": 2702,
+      "sha256": "654f7229b4fb798a5c5ceda4d452330c213164299bb45c9d8416c3b4dfce80ae"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/green_app.py": {
+      "bytes": 10840,
+      "sha256": "27ac8fe02cd94362025f40151658e929556455f55b4a55198c397322e05682af"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/live_tailnet.py": {
+      "bytes": 2832,
+      "sha256": "d6b48f132a31b7cdebfe60e0221d64666301f99ad81748d69170f6923c3566d8"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/network_auth.py": {
+      "bytes": 1559,
+      "sha256": "9efc817f3a4f8b712de7fa34e3904ba5ee6c0c13d407fd46534b6c5d24d37a1a"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/policy.py": {
+      "bytes": 7515,
+      "sha256": "6f5558287e4e76d806f2b8e6be1f84950407be6808f19d0098e062a413d6aa18"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/real_source.py": {
+      "bytes": 9864,
+      "sha256": "071f38abb913676fcae2158da84b53f50e14cf976f659c7dce4929f7b9fd867b"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/redaction.py": {
+      "bytes": 2547,
+      "sha256": "68498905ff52f581b6403a8fa65a171aa50d3a5da71193fa4e113df61e5c4e26"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/server.py": {
+      "bytes": 5986,
+      "sha256": "641bb54d22f97f7ad09388f7c2ddfd38753394ae0c46344c3b54a0c5be393597"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/service.py": {
+      "bytes": 13395,
+      "sha256": "3ec3048eafb5ba5e7e362a75c038e6d5664a5edbb6b79a52e5235057f79ad56c"
+    },
+    "sources/maison_diagnostic_real_v8/gateway/simulation_entrypoint.py": {
+      "bytes": 397,
+      "sha256": "20679b93c3c9fcff6efe66b7bb1f0dff0404b14e8ddb0324be32e15bf6d1282d"
+    },
+    "sources/maison_diagnostic_real_v8/installation-profile.json": {
+      "bytes": 86,
+      "sha256": "98f22d659dbef1eb5e23263646ff5b94543d2ae8e9ea78c8beee6a19ce9ce5d7"
+    },
+    "tools/audit_real_diagnostic.py": {
+      "bytes": 4353,
+      "sha256": "db317e105f89bd43b082adb89b7047d0c050e9182ef3aa3daa423e3b03daae37"
+    },
+    "tools/build_real_diagnostic_image.py": {
+      "bytes": 1257,
+      "sha256": "00346e795da1da5bec398c88ea3597556f4aac613c6e3947aa369c3c276554c8"
+    },
     "tools/catalog.py": {
-      "bytes": 31360,
-      "sha256": "a64b3e2caf079afe9057772c2a123cad91e401f130e3b0b659bc164c9ae10c49"
+      "bytes": 31773,
+      "sha256": "7af505c6ea58abe719c9072bc352cb631f11b708ce136616fc0757209b9ca3b9"
     },
     "tools/check_maintenance_image.py": {
       "bytes": 11757,
       "sha256": "5916a2e6ffa298d8257c634bad4e711e8f34706229bc8fceb04344dd70ed889e"
+    },
+    "tools/check_real_diagnostic_image.py": {
+      "bytes": 1994,
+      "sha256": "e3a5a6425fd3c17323912425fcf4f1e8b54fcf978b9d8e0a2b09c45d9b2d2504"
+    },
+    "tools/real_catalog.py": {
+      "bytes": 21438,
+      "sha256": "1ca046b24653755838dbe7d3698f35fe5fa33d52cdd0115a9e942dc47dd81a7f"
     }
   },
   "format": 1
