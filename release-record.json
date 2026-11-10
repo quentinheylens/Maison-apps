@@ -1,0 +1,18 @@
+{
+  "commit": "baf3df11a5541f8440f0464448d756be8482e0b6",
+  "format": 1,
+  "images": {
+    "maison_deployment_simulator": {
+      "digest": "sha256:e101aa5a7332ee0991406e9df08755443bdec4fa31ee0d4df301a4f7a57d36b8",
+      "image": "ghcr.io/quentinheylens/maison-apps/maison_deployment_simulator",
+      "version": "0.1.1"
+    },
+    "maison_diagnostic_gateway_v6": {
+      "digest": "sha256:e30a5010a21628fc30eaf3f1a88969bca2fcc6df3aca60b9163514428dbe90a8",
+      "image": "ghcr.io/quentinheylens/maison-apps/maison_diagnostic_gateway_v6",
+      "version": "0.6.1"
+    }
+  },
+  "repository": "quentinheylens/Maison-apps",
+  "simulation": true
+}

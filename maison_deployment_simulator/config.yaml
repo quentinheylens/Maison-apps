@@ -1,0 +1,41 @@
+{
+  "apparmor": true,
+  "arch": [
+    "aarch64",
+    "amd64"
+  ],
+  "auth_api": false,
+  "boot": "manual",
+  "breaking_versions": [
+    "0.1.1"
+  ],
+  "description": "Transactions de fichiers fictifs uniquement, aucun montage de configuration",
+  "docker_api": false,
+  "full_access": false,
+  "hassio_api": false,
+  "homeassistant_api": false,
+  "host_dbus": false,
+  "host_network": false,
+  "host_pid": false,
+  "image": "ghcr.io/quentinheylens/maison-apps/maison_deployment_simulator",
+  "ingress": false,
+  "init": false,
+  "map": [],
+  "name": "Maison Deployment Simulator",
+  "options": {
+    "execution_enabled": false,
+    "mode": "simulation",
+    "network_enabled": false
+  },
+  "ports": {},
+  "schema": {
+    "execution_enabled": "bool",
+    "mode": "list(simulation)",
+    "network_enabled": "bool"
+  },
+  "slug": "maison_deployment_simulator",
+  "startup": "application",
+  "timeout": 30,
+  "tmpfs": true,
+  "version": "0.1.1"
+}
