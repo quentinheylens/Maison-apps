@@ -16,7 +16,13 @@ concurrency:
   group: catalogue-publication
   cancel-in-progress: false
 jobs:
+  prepublication-validation:
+    if: github.repository == 'quentinheylens/Maison-apps' && github.ref == 'refs/heads/main' && github.event.repository.private == false
+    uses: ./.github/workflows/verify.yml
+    permissions:
+      contents: read
   build-tested:
+    needs: prepublication-validation
     if: github.repository == 'quentinheylens/Maison-apps' && github.ref == 'refs/heads/main' && github.event.repository.private == false
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -45,6 +51,10 @@ jobs:
           c.publication_allowed(policy, os.environ['REVIEWED_COMMIT'], os.environ['PUBLICATION_CONFIRMATION'], os.environ)
           c.protected_environment(policy)
           PY
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+        with:
+          image: tonistiigi/binfmt@sha256:400a4873b838d1b89194d982c45e5fb3cda4593fbfd7e08a02e76b03b21166f0
+          platforms: arm64
       - run: python3 -I tools/catalog.py build --root . --commit "$REVIEWED_COMMIT" --output /tmp/tested-catalog
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

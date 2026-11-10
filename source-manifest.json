@@ -1,40 +1,40 @@
 {
   "files": {
     ".github/workflows/publish.yml": {
-      "bytes": 5445,
-      "sha256": "d8015a03170af8334c33b8bc78a05ddc02ec44ddfa049c748bdb6a79d501454d"
+      "bytes": 5960,
+      "sha256": "b279bc4c6ad04fd163a1148852d9f91f5d0668dd7af9f321cdab3d7e0296881e"
     },
     ".github/workflows/verify.yml": {
-      "bytes": 1061,
-      "sha256": "b4db9dc6608b6cc0ea588d5ebb7dbc9cd0ebe5383676335f93621328319e49aa"
+      "bytes": 11418,
+      "sha256": "b8a1f7275c0065855ff0258393118955f7809781b3cc7ee4a27c7cc59bdde4b7"
     },
     "DEPENDENCIES.json": {
-      "bytes": 2075,
-      "sha256": "8f9953feba5fbdb7600d39233222db331686a63376432a33c5e034a770b17657"
+      "bytes": 3491,
+      "sha256": "d1e378c5f5ddd0b9616c490fa5870ae35758cbf7d28579dc8478b45cb7e9fd8d"
     },
     "NOTICE.md": {
       "bytes": 1508,
       "sha256": "8278974f3987918207840706e83f0fb8ede4cebb84edb6dcc3824e5606e8c957"
     },
     "README.md": {
-      "bytes": 5428,
-      "sha256": "901968291fea9cda522b8b5c22d54dbc6920989957c04fc28f5a95d15ef3f80d"
+      "bytes": 5864,
+      "sha256": "151bcfcbac8160ae774b052271fbd6757b1bb6ddccd3c1460032378f37c3de64"
     },
     "SECURITY.md": {
-      "bytes": 3095,
-      "sha256": "5adb74859ed5839fdc89d016d2b7de425878f181f48bd746bc55b297dd29723a"
+      "bytes": 27536,
+      "sha256": "454bd9e0a4485a8277fb3c913ce3d5a351cc29c20fdf3b9b744663f297f8db4a"
     },
     "catalog-policy.json": {
-      "bytes": 232,
-      "sha256": "0ab3316298d1d0b329fbce02a3ea3d1ba97034cb6cf2bf6b104d07dcc19b354b"
+      "bytes": 231,
+      "sha256": "2749cd8bb9fb3f4d518952db2a277d47016dd87d7eadc2d8811794eee1b91208"
     },
     "repository.yaml": {
       "bytes": 104,
       "sha256": "492d06b94d56b3831253f3699ccbfe766e1fec038bf6db54c618caf8fbaff06e"
     },
     "sources/maison_deployment_simulator/Dockerfile": {
-      "bytes": 574,
-      "sha256": "543d80884ea6f8b9d02b7b82d59d035de8f8d739af643a972d4f7b1822255342"
+      "bytes": 2925,
+      "sha256": "cca306e900bf21356f0d6778697e75b631d43f300b40438c5a5320a1104552b9"
     },
     "sources/maison_deployment_simulator/PyYAML-LICENSE": {
       "bytes": 1101,
@@ -81,8 +81,8 @@
       "sha256": "20679b93c3c9fcff6efe66b7bb1f0dff0404b14e8ddb0324be32e15bf6d1282d"
     },
     "sources/maison_deployment_simulator/healthcheck.py": {
-      "bytes": 513,
-      "sha256": "bfe404f5520bf51daf580ca99286e77e6d6ca4f2aa66f9def66be93ac1c9bb81"
+      "bytes": 3094,
+      "sha256": "806d9a3fd4643c9c82270883e8fc06a316dba91e38f1cb798ef431afbf45ec04"
     },
     "sources/maison_deployment_simulator/installation-profile.json": {
       "bytes": 67,
@@ -101,8 +101,8 @@
       "sha256": "a1b5864540aac5cec331b450390e00282639378a2e0d68c8075d52fc93ab4539"
     },
     "sources/maison_deployment_simulator/maintenance/entrypoint.py": {
-      "bytes": 1889,
-      "sha256": "d42a875d6cdec28c8821e35ee481276d7be9d2d2839840b306f8f3e58c2d351d"
+      "bytes": 2202,
+      "sha256": "8a26caaea8300071261fdce599196d60bf9d24538d219859ad39a30d60c944e9"
     },
     "sources/maison_deployment_simulator/maintenance/evidence.py": {
       "bytes": 3248,
@@ -205,8 +205,8 @@
       "sha256": "953408cd2570f0c83dc2fe39f7e4e388e41eeb05738aa69196a5f6ffcf6ba79e"
     },
     "sources/maison_diagnostic_gateway_v6/Dockerfile": {
-      "bytes": 574,
-      "sha256": "caabf86f58533fee0a009983d6f8fb69f20972d87563b9451185973599cd7899"
+      "bytes": 2925,
+      "sha256": "fb0d6926f83ef0f6fe1fdbeaa55dd647b69d1561b630b787baad9c2bbd471e92"
     },
     "sources/maison_diagnostic_gateway_v6/PyYAML-LICENSE": {
       "bytes": 1101,
@@ -253,8 +253,8 @@
       "sha256": "20679b93c3c9fcff6efe66b7bb1f0dff0404b14e8ddb0324be32e15bf6d1282d"
     },
     "sources/maison_diagnostic_gateway_v6/healthcheck.py": {
-      "bytes": 513,
-      "sha256": "bfe404f5520bf51daf580ca99286e77e6d6ca4f2aa66f9def66be93ac1c9bb81"
+      "bytes": 3094,
+      "sha256": "806d9a3fd4643c9c82270883e8fc06a316dba91e38f1cb798ef431afbf45ec04"
     },
     "sources/maison_diagnostic_gateway_v6/installation-profile.json": {
       "bytes": 67,
@@ -273,8 +273,8 @@
       "sha256": "a1b5864540aac5cec331b450390e00282639378a2e0d68c8075d52fc93ab4539"
     },
     "sources/maison_diagnostic_gateway_v6/maintenance/entrypoint.py": {
-      "bytes": 1889,
-      "sha256": "d42a875d6cdec28c8821e35ee481276d7be9d2d2839840b306f8f3e58c2d351d"
+      "bytes": 2202,
+      "sha256": "8a26caaea8300071261fdce599196d60bf9d24538d219859ad39a30d60c944e9"
     },
     "sources/maison_diagnostic_gateway_v6/maintenance/evidence.py": {
       "bytes": 3248,
@@ -377,12 +377,12 @@
       "sha256": "953408cd2570f0c83dc2fe39f7e4e388e41eeb05738aa69196a5f6ffcf6ba79e"
     },
     "tools/catalog.py": {
-      "bytes": 28342,
-      "sha256": "97b0d2aea972c60c384978c0025c2dc208168bf3af15fcff7906c6b95917d5c4"
+      "bytes": 31360,
+      "sha256": "a64b3e2caf079afe9057772c2a123cad91e401f130e3b0b659bc164c9ae10c49"
     },
     "tools/check_maintenance_image.py": {
-      "bytes": 3930,
-      "sha256": "60bacb7dc2670a433f5e6161e6b642451405f8e5dd52ea52d25ad781ec5c5e40"
+      "bytes": 11757,
+      "sha256": "5916a2e6ffa298d8257c634bad4e711e8f34706229bc8fceb04344dd70ed889e"
     }
   },
   "format": 1

@@ -1,6 +1,36 @@
 {
+  "build_emulator": "tonistiigi/binfmt@sha256:400a4873b838d1b89194d982c45e5fb3cda4593fbfd7e08a02e76b03b21166f0",
   "format": 1,
-  "runtime_base": "python:3.12-alpine3.22@sha256:a190708a2dec1bd18b1decb539f8e8f5407abaa9bf39cacda583f7f8c11db322",
+  "removed_runtime_components": [
+    "SQLite shared library and Python sqlite3/_sqlite3",
+    "pip distribution, entrypoints and ensurepip (including bundled wheels)"
+  ],
+  "runtime_base": "python:3.15.2-alpine3.24@sha256:a0f2e268f2ce8f3709611a90054ec6a8ae31f6251f5896b8648b9bb99835e30a",
+  "runtime_provenance": {
+    "commit": "f4c67ece208dead594e43628d22e3c6027dd97ab",
+    "directory": "3.15/alpine3.24",
+    "platform_manifests": {
+      "amd64": "sha256:a943ed02f4e22d024d2b4fc5083619497dfb9bc1c64c193861f3bc6d3074f5b1",
+      "arm64": "sha256:4e2ab0675612ba77cc94ed8d3522d1c7c1ec5c521bc4db61c6e3d00a011841f9"
+    },
+    "upstream": "https://github.com/docker-library/python"
+  },
+  "runtime_security_updates": {
+    "aports_commit": "95ecd1043f781a308ae20a7aa08b86070806946f",
+    "signature_policy": "apk verify with the pinned base image architecture-specific Alpine keys; no allow-untrusted; network disabled during RUN",
+    "zlib": {
+      "amd64": {
+        "sha256": "7b05bc778b8b25cd880835b40114182bd4d1581717504d0129c810c0a14291cb",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/zlib-1.4-r0.apk",
+        "version": "1.4-r0"
+      },
+      "arm64": {
+        "sha256": "d3e30d012a3445222b0b4a28f1d4d97ce67387f8b48561921111696da174f0de",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/aarch64/zlib-1.4-r0.apk",
+        "version": "1.4-r0"
+      }
+    }
+  },
   "vendored": {
     "license": "MIT",
     "license_sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4",
